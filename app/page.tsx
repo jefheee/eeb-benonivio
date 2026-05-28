@@ -1,115 +1,230 @@
 import Link from "next/link";
-import { ArrowRight, MessageSquare, MapPin, GraduationCap, Calendar, Users, Award } from "lucide-react";
-import { InstagramIcon } from "@/components/ui/icons";
+import {
+  GraduationCap,
+  MessageSquare,
+  FileText,
+  PhoneCall,
+  History,
+  BookOpen,
+  FlaskConical,
+  ChevronRight,
+  Smile
+} from "lucide-react";
 import { SCHOOL_INFO } from "@/lib/constants";
-import TurmasGrid from "@/components/features/turmas-grid";
 
 export default function Home() {
   return (
-    <div className="relative min-h-[calc(100vh-6rem)] flex flex-col bg-white">
+    <div className="bg-pure-white text-slate-text min-h-screen flex flex-col relative overflow-hidden">
+      
+      {/* Decorative Background Shapes */}
+      <div className="absolute top-0 right-0 -z-10 w-96 h-96 opacity-[0.03] pointer-events-none">
+        <svg className="w-full h-full fill-primary" preserveAspectRatio="none" viewBox="0 0 100 100">
+          <polygon points="50,0 100,100 0,100"></polygon>
+        </svg>
+      </div>
+      <div className="absolute bottom-[20%] left-0 -z-10 w-64 h-64 opacity-[0.03] pointer-events-none">
+        <svg className="w-full h-full fill-secondary" preserveAspectRatio="none" viewBox="0 0 100 100">
+          <polygon points="50,0 100,100 0,100"></polygon>
+        </svg>
+      </div>
+
       {/* Hero Section */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-10 sm:pt-16 pb-20 w-full">
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
+      <section className="w-full bg-pure-white py-20 md:py-32 px-4 md:px-8 flex flex-col items-center justify-center text-center relative overflow-hidden">
+        <div className="max-w-[800px] mx-auto flex flex-col items-center z-10">
           
-          {/* Hero Left Content */}
-          <div className="lg:col-span-7 space-y-6 sm:space-y-8 text-center lg:text-left">
-            <div className="inline-flex items-center space-x-2 bg-[#1B2F78]/5 border border-[#1B2F78]/20 text-[#1B2F78] px-3.5 py-1.5 rounded-full text-xs font-bold tracking-wider uppercase">
-              <GraduationCap className="h-4 w-4 text-[#F90000]" />
-              <span>Portal Oficial • Santa Catarina</span>
-            </div>
-
-            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight font-display text-[#1B2F78] leading-[1.1] sm:leading-none">
-              Educação Pública de Excelência
-            </h1>
-
-            <p className="text-base sm:text-lg lg:text-xl text-slate-700 font-medium max-w-2xl mx-auto lg:mx-0">
-              Seja bem-vindo ao portal da <span className="font-bold text-[#1B2F78]">{SCHOOL_INFO.name}</span>. Acompanhe comunicados oficiais, eventos escolares, convites de grupos pedagógicos e canais de contato com a nossa equipe.
-            </p>
-
-            {/* CTAs */}
-            <div className="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-4">
-              <a
-                href={SCHOOL_INFO.whatsapp}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="w-full sm:w-auto inline-flex items-center justify-center space-x-2 bg-[#1B2F78] hover:bg-[#1B2F78]/90 text-white font-bold px-8 py-4 rounded-2xl transition-all duration-300 shadow-xl shadow-[#1B2F78]/25 hover:-translate-y-0.5 outline-none"
-              >
-                <MessageSquare className="h-5 w-5 text-[#F90000]" />
-                <span>Secretaria Digital</span>
-              </a>
-              <Link
-                href="/sobre"
-                className="w-full sm:w-auto inline-flex items-center justify-center space-x-2 bg-white hover:bg-slate-50 border border-slate-200 text-[#1B2F78] font-bold px-8 py-4 rounded-2xl transition-all duration-300 shadow-lg shadow-slate-100"
-              >
-                <span>Conhecer Projeto</span>
-                <ArrowRight className="h-4 w-4 text-[#F90000]" />
-              </Link>
-            </div>
-
-            {/* Quick Contacts */}
-            <div className="pt-6 border-t border-slate-200 flex flex-wrap justify-center lg:justify-start gap-x-8 gap-y-3 text-xs text-slate-500 font-bold">
-              <div className="flex items-center space-x-2">
-                <MapPin className="h-4 w-4 text-[#F90000]" />
-                <span>Palhoça, SC</span>
-              </div>
-              <div className="flex items-center space-x-2">
-                <InstagramIcon className="h-4 w-4 text-[#1B2F78]" />
-                <a href={SCHOOL_INFO.instagramUrl} target="_blank" rel="noopener noreferrer" className="hover:underline">
-                  {SCHOOL_INFO.instagramHandle}
-                </a>
-              </div>
-            </div>
+          {/* Badge */}
+          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-surface-container-low border border-soft-border text-secondary font-semibold text-xs mb-8 shadow-sm">
+            <GraduationCap className="h-4 w-4" />
+            <span>Matrículas Abertas 2026</span>
           </div>
-
-          {/* Hero Right Visuals */}
-          <div className="lg:col-span-5 relative w-full max-w-md mx-auto lg:max-w-none">
-            <div className="relative z-10 bg-slate-900 p-6 sm:p-8 rounded-3xl shadow-2xl space-y-6">
-              
-              {/* Highlight cards */}
-              <div className="flex items-start space-x-4 border-b border-white/10 pb-4">
-                <div className="p-3 rounded-xl bg-white/5 text-white">
-                  <Calendar className="h-5 w-5 text-[#F90000]" />
-                </div>
-                <div>
-                  <h4 className="text-white font-bold text-sm">Ano Letivo 2026</h4>
-                  <p className="text-xs text-slate-400 mt-1 font-medium">
-                    Acesse o calendário oficial de aulas, recessos e avaliações regulares.
-                  </p>
-                </div>
-              </div>
-
-              <div className="flex items-start space-x-4 border-b border-white/10 pb-4">
-                <div className="p-3 rounded-xl bg-white/5 text-white">
-                  <Users className="h-5 w-5 text-[#F90000]" />
-                </div>
-                <div>
-                  <h4 className="text-white font-bold text-sm">Comunidade Escolar</h4>
-                  <p className="text-xs text-slate-400 mt-1 font-medium">
-                    Participe ativamente das atividades e reuniões gerais do Grêmio e da APP.
-                  </p>
-                </div>
-              </div>
-
-              <div className="flex items-start space-x-4">
-                <div className="p-3 rounded-xl bg-white/5 text-white">
-                  <Award className="h-5 w-5 text-[#F90000]" />
-                </div>
-                <div>
-                  <h4 className="text-white font-bold text-sm">Informativos & Avisos</h4>
-                  <p className="text-xs text-slate-400 mt-1 font-medium">
-                    Confira novidades, projetos escolares e avisos oficiais integrados à comunidade.
-                  </p>
-                </div>
-              </div>
-
-            </div>
+          
+          {/* Title */}
+          <h1 className="font-display text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-primary mb-6 leading-tight">
+            Bem-vindo à EEB Prof. Benonívio João Martins
+          </h1>
+          
+          {/* Paragraph */}
+          <p className="text-base sm:text-lg md:text-xl text-slate-500 max-w-[640px] mb-10 font-medium leading-relaxed">
+            Educação de excelência, focada na formação de cidadãos conscientes e preparados para o futuro. Um espaço dedicado ao desenvolvimento integral do aluno.
+          </p>
+          
+          {/* CTAs */}
+          <div className="flex flex-col sm:flex-row gap-4 w-full sm:w-auto">
+            <Link
+              href="/sobre"
+              className="bg-secondary text-white font-semibold px-8 py-3 rounded shadow-subtle hover:bg-opacity-95 transition-all text-center"
+            >
+              Conheça a Escola
+            </Link>
+            <a
+              href={SCHOOL_INFO.whatsapp}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="bg-pure-white text-primary border border-primary font-semibold px-8 py-3 rounded shadow-subtle hover:bg-surface-container-low transition-all text-center flex items-center justify-center gap-2"
+            >
+              <MessageSquare className="h-4 w-4" />
+              <span>Fale Conosco</span>
+            </a>
           </div>
 
         </div>
       </section>
 
-      {/* Turmas Grid Section */}
-      <TurmasGrid />
+      {/* Quick Access (Bento Style Cards) */}
+      <section className="max-w-[1200px] mx-auto px-4 md:px-8 py-16 relative w-full">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+          
+          {/* Card 1 - Editais APP */}
+          <Link
+            href="/app"
+            className="bg-pure-white border border-soft-border rounded-xl p-8 shadow-subtle hover:shadow-md hover:border-secondary transition-all duration-300 group flex flex-col items-center text-center gap-4 outline-none"
+          >
+            <div className="w-16 h-16 rounded-full bg-surface-container-low flex items-center justify-center text-secondary group-hover:scale-110 transition-transform">
+              <FileText className="h-8 w-8" />
+            </div>
+            <div>
+              <h3 className="font-display text-xl font-bold text-primary mb-2">Editais APP</h3>
+              <p className="text-sm text-slate-500 font-medium leading-relaxed">
+                Consulte documentos, editais e publicações oficiais da Associação.
+              </p>
+            </div>
+          </Link>
+
+          {/* Card 2 - Contato */}
+          <a
+            href={SCHOOL_INFO.whatsapp}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="bg-pure-white border border-soft-border rounded-xl p-8 shadow-subtle hover:shadow-md hover:border-secondary transition-all duration-300 group flex flex-col items-center text-center gap-4 outline-none"
+          >
+            <div className="w-16 h-16 rounded-full bg-surface-container-low flex items-center justify-center text-secondary group-hover:scale-110 transition-transform">
+              <PhoneCall className="h-8 w-8" />
+            </div>
+            <div>
+              <h3 className="font-display text-xl font-bold text-primary mb-2">Contato</h3>
+              <p className="text-sm text-slate-500 font-medium leading-relaxed">
+                Fale com a secretaria, direção ou coordenação pedagógica via WhatsApp.
+              </p>
+            </div>
+          </a>
+
+          {/* Card 3 - Histórico */}
+          <Link
+            href="/sobre"
+            className="bg-pure-white border border-soft-border rounded-xl p-8 shadow-subtle hover:shadow-md hover:border-secondary transition-all duration-300 group flex flex-col items-center text-center gap-4 outline-none"
+          >
+            <div className="w-16 h-16 rounded-full bg-surface-container-low flex items-center justify-center text-secondary group-hover:scale-110 transition-transform">
+              <History className="h-8 w-8" />
+            </div>
+            <div>
+              <h3 className="font-display text-xl font-bold text-primary mb-2">Histórico</h3>
+              <p className="text-sm text-slate-500 font-medium leading-relaxed">
+                Conheça a trajetória, o patrono e os valores da nossa instituição.
+              </p>
+            </div>
+          </Link>
+
+        </div>
+      </section>
+
+      {/* Classes Section */}
+      <section className="max-w-[1200px] mx-auto px-4 md:px-8 py-16 mb-16 relative w-full">
+        <div className="mb-12 border-b border-soft-border pb-4 flex justify-between items-end">
+          <div>
+            <h2 className="font-display text-2xl md:text-3xl font-bold text-primary mb-2">Nossas Turmas</h2>
+            <p className="text-sm text-slate-500 font-medium">Estrutura curricular completa do básico ao avançado.</p>
+          </div>
+        </div>
+
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          
+          {/* Category 1 */}
+          <div className="flex flex-col gap-4">
+            <h3 className="font-display text-lg md:text-xl font-bold text-primary flex items-center gap-2 mb-2">
+              <Smile className="h-5 w-5 text-secondary" />
+              <span>Anos Iniciais</span>
+            </h3>
+            
+            <a
+              href="#"
+              className="bg-pure-white border border-soft-border rounded-lg p-5 shadow-subtle flex items-center justify-between hover:border-secondary transition-colors cursor-pointer group outline-none"
+            >
+              <span className="text-sm font-semibold text-slate-500 group-hover:text-primary transition-colors">
+                1º ao 5º Ano
+              </span>
+              <ChevronRight className="h-4 w-4 text-slate-400 group-hover:text-secondary transition-colors" />
+            </a>
+
+            <a
+              href="#"
+              className="bg-pure-white border border-soft-border rounded-lg p-5 shadow-subtle flex items-center justify-between hover:border-secondary transition-colors cursor-pointer group outline-none"
+            >
+              <span className="text-sm font-semibold text-slate-500 group-hover:text-primary transition-colors">
+                Apoio Pedagógico
+              </span>
+              <ChevronRight className="h-4 w-4 text-slate-400 group-hover:text-secondary transition-colors" />
+            </a>
+          </div>
+
+          {/* Category 2 */}
+          <div className="flex flex-col gap-4">
+            <h3 className="font-display text-lg md:text-xl font-bold text-primary flex items-center gap-2 mb-2">
+              <BookOpen className="h-5 w-5 text-secondary" />
+              <span>Ensino Fundamental II</span>
+            </h3>
+
+            <a
+              href="#"
+              className="bg-pure-white border border-soft-border rounded-lg p-5 shadow-subtle flex items-center justify-between hover:border-secondary transition-colors cursor-pointer group outline-none"
+            >
+              <span className="text-sm font-semibold text-slate-500 group-hover:text-primary transition-colors">
+                6º ao 9º Ano
+              </span>
+              <ChevronRight className="h-4 w-4 text-slate-400 group-hover:text-secondary transition-colors" />
+            </a>
+
+            <a
+              href="#"
+              className="bg-pure-white border border-soft-border rounded-lg p-5 shadow-subtle flex items-center justify-between hover:border-secondary transition-colors cursor-pointer group outline-none"
+            >
+              <span className="text-sm font-semibold text-slate-500 group-hover:text-primary transition-colors">
+                Projetos Extracurriculares
+              </span>
+              <ChevronRight className="h-4 w-4 text-slate-400 group-hover:text-secondary transition-colors" />
+            </a>
+          </div>
+
+          {/* Category 3 */}
+          <div className="flex flex-col gap-4">
+            <h3 className="font-display text-lg md:text-xl font-bold text-primary flex items-center gap-2 mb-2">
+              <FlaskConical className="h-5 w-5 text-secondary" />
+              <span>Ensino Médio</span>
+            </h3>
+
+            <a
+              href="#"
+              className="bg-pure-white border border-soft-border rounded-lg p-5 shadow-subtle flex items-center justify-between hover:border-secondary transition-colors cursor-pointer group outline-none"
+            >
+              <span className="text-sm font-semibold text-slate-500 group-hover:text-primary transition-colors">
+                Novo Ensino Médio
+              </span>
+              <ChevronRight className="h-4 w-4 text-slate-400 group-hover:text-secondary transition-colors" />
+            </a>
+
+            <a
+              href="#"
+              className="bg-pure-white border border-soft-border rounded-lg p-5 shadow-subtle flex items-center justify-between hover:border-secondary transition-colors cursor-pointer group outline-none"
+            >
+              <span className="text-sm font-semibold text-slate-500 group-hover:text-primary transition-colors">
+                Preparatório ENEM
+              </span>
+              <ChevronRight className="h-4 w-4 text-slate-400 group-hover:text-secondary transition-colors" />
+            </a>
+          </div>
+
+        </div>
+      </section>
+
     </div>
   );
 }

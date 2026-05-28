@@ -10,20 +10,20 @@
     --card-foreground: 222.2 84% 4.9%;
     --popover: 0 0% 100%;
     --popover-foreground: 222.2 84% 4.9%;
-    --primary: 227 63% 29%; /* Institutional Blue #1B2F78 */
+    --primary: 225 100% 19%; /* Stitch Azul Institucional #00185f */
     --primary-foreground: 0 0% 100%;
-    --secondary: 0 100% 49%; /* Highlight Red #F90000 */
+    --secondary: 0 100% 37%; /* Stitch Vermelho CTA #bc0100 */
     --secondary-foreground: 0 0% 100%;
     --muted: 210 40% 96.1%;
     --muted-foreground: 215.4 16.3% 46.9%;
-    --accent: 0 100% 49%;
+    --accent: 0 100% 37%;
     --accent-foreground: 0 0% 100%;
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 210 40% 98%;
-    --border: 214.3 31.8% 90%;
+    --border: 214.3 31.8% 90%; /* soft-border #E2E8F0 */
     --input: 214.3 31.8% 90%;
-    --ring: 227 63% 29%;
-    --radius: 1rem;
+    --ring: 225 100% 19%;
+    --radius: 0.5rem;
   }
 }
 
@@ -33,15 +33,15 @@
   }
   body {
     background-color: #ffffff;
-    color: hsl(var(--foreground));
+    color: #334155; /* slate-text #334155 */
     font-feature-settings: "rlig" 1, "calt" 1;
     overflow-x: hidden;
   }
 }
 
 @layer utilities {
-  .glassmorphism {
-    @apply bg-white/90 backdrop-blur-md border border-slate-200/80;
+  .shadow-subtle {
+    box-shadow: 0px 4px 20px rgba(15, 23, 42, 0.05);
   }
 }
 

@@ -42,6 +42,11 @@ const config: Config = {
           DEFAULT: "hsl(var(--card))",
           foreground: "hsl(var(--card-foreground))",
         },
+        // Stitch design system custom colors
+        "soft-border": "#E2E8F0",
+        "slate-text": "#334155",
+        "surface-container-low": "#f2f4f4",
+        "pure-white": "#FFFFFF",
       },
       borderRadius: {
         lg: "var(--radius)",
