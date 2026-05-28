@@ -51,6 +51,9 @@ export const metadata: Metadata = {
       "max-snippet": -1,
     },
   },
+  icons: {
+    icon: "/assets/icon/logobeno1.png",
+  },
 };
 
 export const viewport: Viewport = {
