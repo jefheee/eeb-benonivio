@@ -1,20 +1,8 @@
-import { Users, HeartHandshake, ShieldCheck, Download, FileText } from "lucide-react";
-
-interface DocumentoItem {
-  title: string;
-  link: string;
-}
-
-const DOCUMENTOS_PUBLICOS: DocumentoItem[] = [
-  { title: "Estatuto da APP", link: "#" },
-  { title: "Solicitação de Recurso para Assistência ao Estudante (Materiais e Deslocamento)", link: "#" },
-  { title: "Formulário de Orçamento para Pesquisa de Preço", link: "#" },
-  { title: "Revista Okaza (Publicação de Relatos de Experiências Docentes)", link: "#" },
-];
+import { Users, HeartHandshake, ShieldCheck, Download, BookOpen } from "lucide-react";
 
 export default function APPPage() {
   return (
-    <div className="py-12 space-y-16">
+    <div className="py-6 space-y-12">
       
       {/* Page Header */}
       <div className="text-center max-w-3xl mx-auto space-y-4">
@@ -26,75 +14,135 @@ export default function APPPage() {
           CNPJ: 78.639.903/0001-04
         </p>
         <p className="text-slate-600 font-medium">
-          A Associação de Pais e Professores gere os recursos e auxilia na manutenção da escola, promovendo a integração entre a família e o ambiente escolar.
+          A Associação de Pais e Professores gere os recursos e auxilia ativamente na manutenção e nos projetos pedagógicos da escola.
         </p>
       </div>
 
       {/* Colegiado Pillars Grid */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
         
-        {/* Pillar 1 */}
+        {/* Card 1: Colegiado */}
         <div className="bg-white border border-slate-200 shadow-sm rounded-xl p-6 text-center space-y-3">
           <div className="p-3 bg-[#1B2F78]/10 text-primary w-fit mx-auto rounded-xl">
             <Users className="h-6 w-6" />
           </div>
-          <h2 className="text-xl font-bold text-primary">Colegiado</h2>
+          <h2 className="text-xl font-bold text-primary font-display">Colegiado</h2>
           <p className="text-sm text-slate-600 font-medium leading-relaxed">
-            Representação coletiva e democrática dos pais, professores e funcionários nas decisões e planejamentos institucionais.
+            Representação democrática de pais, professores e comunidade no planejamento e tomadas de decisão.
           </p>
         </div>
 
-        {/* Pillar 2 */}
-        <div className="bg-white border border-slate-200 shadow-sm rounded-xl p-6 text-center space-y-3">
-          <div className="p-3 bg-secondary/10 text-secondary w-fit mx-auto rounded-xl">
-            <HeartHandshake className="h-6 w-6" />
-          </div>
-          <h2 className="text-xl font-bold text-primary">Parcerias</h2>
-          <p className="text-sm text-slate-600 font-medium leading-relaxed">
-            Apoio a projetos internos, eventos beneficentes e melhorias contínuas na infraestrutura física e digital da escola.
-          </p>
-        </div>
-
-        {/* Pillar 3 */}
+        {/* Card 2: Parcerias */}
         <div className="bg-white border border-slate-200 shadow-sm rounded-xl p-6 text-center space-y-3">
           <div className="p-3 bg-[#1B2F78]/10 text-primary w-fit mx-auto rounded-xl">
-            <ShieldCheck className="h-6 w-6" />
+            <HeartHandshake className="h-6 w-6 text-secondary" />
           </div>
-          <h2 className="text-xl font-bold text-primary">Transparência</h2>
+          <h2 className="text-xl font-bold text-primary font-display">Parcerias</h2>
           <p className="text-sm text-slate-600 font-medium leading-relaxed">
-            Prestação de contas periódica e participação comunitária no direcionamento ético de recursos da APP.
+            Organização de feiras, eventos beneficentes e captação de recursos para melhorias no espaço escolar.
+          </p>
+        </div>
+
+        {/* Card 3: Transparência */}
+        <div className="bg-white border border-slate-200 shadow-sm rounded-xl p-6 text-center space-y-3">
+          <div className="p-3 bg-[#1B2F78]/10 text-primary w-fit mx-auto rounded-xl">
+            <ShieldCheck className="h-6 w-6 animate-pulse" />
+          </div>
+          <h2 className="text-xl font-bold text-primary font-display">Transparência</h2>
+          <p className="text-sm text-slate-600 font-medium leading-relaxed">
+            Prestação de contas e divulgação periódica de relatórios financeiros e investimentos realizados.
           </p>
         </div>
 
       </div>
 
-      {/* Documentos Públicos Grid Section */}
-      <div className="space-y-6 bg-white border border-slate-200 shadow-sm rounded-xl p-6">
-        <div className="flex items-center space-x-3 text-primary border-b pb-4">
-          <FileText className="h-6 w-6 text-secondary" />
-          <h2 className="text-2xl font-bold">Documentos Públicos</h2>
-        </div>
+      {/* Double Column Section: Documentos & Revista Okaza */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-start">
         
-        <p className="text-sm text-slate-600 font-medium max-w-2xl leading-relaxed">
-          Consulte e realize o download dos documentos, formulários e publicações da APP.
-        </p>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {DOCUMENTOS_PUBLICOS.map((doc) => (
-            <a
-              key={doc.title}
-              href={doc.link}
-              className="flex items-center justify-between p-4 rounded-xl border border-slate-200 hover:border-primary/20 hover:bg-slate-50 transition-all font-semibold text-slate-700 text-sm group outline-none"
-            >
-              <span className="max-w-[80%] leading-relaxed">{doc.title}</span>
-              <div className="p-2 bg-slate-50 group-hover:bg-primary/10 group-hover:text-primary rounded-lg text-slate-400 transition-colors">
-                <Download className="h-4 w-4 shrink-0" />
+        {/* Documentos Públicos Card */}
+        <div className="bg-white border border-slate-200 shadow-sm rounded-xl p-6 space-y-6">
+          <h2 className="text-2xl font-bold text-primary border-b pb-4">
+            Documentos Públicos
+          </h2>
+          <p className="text-sm text-slate-600 font-medium">
+            Realize o download oficial dos formulários, atas e estatutos administrados pela APP.
+          </p>
+          
+          <div className="space-y-4">
+            {/* Doc 1 */}
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between p-4 rounded-xl border border-slate-200 gap-4">
+              <div>
+                <span className="font-bold text-slate-900 text-sm block">Ata e Estatuto da APP</span>
+                <span className="text-xs text-slate-400 font-semibold">Documento PDF Oficial</span>
               </div>
-            </a>
-          ))}
-        </div>
-      </div>
+              <a 
+                href="/assets/docs/estatuto-app.pdf" 
+                download 
+                className="inline-flex items-center justify-center gap-2 bg-[#1B2F78] hover:bg-[#1B2F78]/95 text-white font-bold px-4 py-2.5 rounded-lg text-xs transition-all flex-shrink-0"
+              >
+                <Download className="h-3.5 w-3.5" />
+                <span>Baixar Estatuto</span>
+              </a>
+            </div>
 
+            {/* Doc 2 */}
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between p-4 rounded-xl border border-slate-200 gap-4">
+              <div>
+                <span className="font-bold text-slate-900 text-sm block">Orçamento de Preços</span>
+                <span className="text-xs text-slate-400 font-semibold">Modelo de Orçamento DOCX</span>
+              </div>
+              <a 
+                href="/assets/docs/ORÇAMENTO.docx" 
+                download 
+                className="inline-flex items-center justify-center gap-2 bg-[#1B2F78] hover:bg-[#1B2F78]/95 text-white font-bold px-4 py-2.5 rounded-lg text-xs transition-all flex-shrink-0"
+              >
+                <Download className="h-3.5 w-3.5" />
+                <span>Baixar Modelo</span>
+              </a>
+            </div>
+
+            {/* Doc 3 */}
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between p-4 rounded-xl border border-slate-200 gap-4">
+              <div>
+                <span className="font-bold text-slate-900 text-sm block">Solicitação de Recurso</span>
+                <span className="text-xs text-slate-400 font-semibold">Formulário de Auxílio ao Estudante</span>
+              </div>
+              <a 
+                href="/assets/docs/SOLICITAÇÃO DE RECURSO PARA ASSISTÊNCIA AO ESTUDANTE" 
+                download 
+                className="inline-flex items-center justify-center gap-2 bg-[#1B2F78] hover:bg-[#1B2F78]/95 text-white font-bold px-4 py-2.5 rounded-lg text-xs transition-all flex-shrink-0"
+              >
+                <Download className="h-3.5 w-3.5" />
+                <span>Baixar Formulário</span>
+              </a>
+            </div>
+          </div>
+        </div>
+
+        {/* Revista Okaza Card */}
+        <div className="bg-white border border-slate-200 shadow-sm rounded-xl p-6 flex flex-col justify-between space-y-6">
+          <div>
+            <h2 className="text-2xl font-bold text-primary border-b pb-4 mb-4 flex items-center gap-2">
+              <BookOpen className="h-6 w-6 text-secondary" />
+              <span>Revista Okaza</span>
+            </h2>
+            <div className="space-y-4 text-sm text-slate-600 font-medium leading-relaxed">
+              <p>
+                A **Revista Okaza** é um projeto coordenado pela APP focado em relatos de experiências docentes e publicações interdisciplinares. A revista serve como um canal de registro científico e pedagógico dos trabalhos desenvolvidos em nossa escola.
+              </p>
+              <p>
+                A publicação fomenta a troca de ideias, metodologias inovadoras e a valorização das conquistas intelectuais de nossos alunos e corpo docente, documentando a trajetória cultural e de ensino da instituição.
+              </p>
+            </div>
+          </div>
+          <div className="pt-4 border-t border-slate-100">
+            <button className="bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold px-6 py-2.5 rounded-xl text-xs transition-all cursor-not-allowed" disabled>
+              Acessar Edições Online (Em breve)
+            </button>
+          </div>
+        </div>
+
+      </div>
     </div>
   );
 }

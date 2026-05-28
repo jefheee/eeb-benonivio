@@ -14,25 +14,27 @@ export default function Header() {
 
   return (
     <header className="bg-pure-white border-b border-soft-border shadow-sm sticky top-0 z-50 w-full">
-      <div className="flex justify-between items-center w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+      <div className="flex md:grid md:grid-cols-3 justify-between items-center w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
         
-        {/* Brand */}
-        <Link href="/" className="flex items-center gap-3 outline-none">
-          <Image
-            src="/assets/icon/logobeno1.png"
-            alt="Logo EEB Benonívio"
-            width={40}
-            height={40}
-            className="w-10 h-10 object-contain"
-            priority
-          />
-          <span className="font-display text-xl font-bold text-primary">
-            EEB Prof. Benonívio
-          </span>
-        </Link>
+        {/* Brand (Left Column) */}
+        <div className="flex justify-start items-center">
+          <Link href="/" className="flex items-center gap-3 outline-none">
+            <Image
+              src="/assets/icon/logobeno1.png"
+              alt="Logo EEB Benonívio"
+              width={40}
+              height={40}
+              className="w-10 h-10 object-contain"
+              priority
+            />
+            <span className="font-display text-xl font-bold text-primary whitespace-nowrap">
+              EEB Prof. Benonívio
+            </span>
+          </Link>
+        </div>
 
-        {/* Navigation Links (Desktop) */}
-        <nav className="hidden md:flex items-center gap-8">
+        {/* Navigation Links (Desktop - Middle Column) */}
+        <nav className="hidden md:flex justify-center items-center gap-8">
           {NAV_ITEMS.map((item) => {
             const isActive = pathname === item.href;
             return (
@@ -52,8 +54,8 @@ export default function Header() {
           })}
         </nav>
 
-        {/* Trailing CTA */}
-        <div className="flex items-center gap-4">
+        {/* Trailing CTA (Right Column / Mobile menu button) */}
+        <div className="flex justify-end items-center gap-4">
           <a
             href={SCHOOL_INFO.whatsapp}
             target="_blank"

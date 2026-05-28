@@ -1,138 +1,151 @@
-import { MessageSquare, BookOpen, Layers, ShieldCheck } from "lucide-react";
+import { MessageSquare, Smile, BookOpen, FlaskConical, ChevronRight } from "lucide-react";
 
-interface TurmaGroup {
-  name: string;
-  link: string;
-}
-
-interface Nivel {
-  title: string;
-  description: string;
-  icon: React.ComponentType<{ className?: string }>;
-  turmas: TurmaGroup[];
-  color: "blue" | "red" | "slate";
-}
-
-const NIVEIS_ENSINO: Nivel[] = [
-  {
-    title: "Anos Iniciais",
-    description: "1º ao 5º Ano do Ensino Fundamental",
-    icon: BookOpen,
-    color: "blue",
-    turmas: [
-      { name: "1º Ano", link: "#" },
-      { name: "2º Ano", link: "#" },
-      { name: "3º Ano", link: "#" },
-      { name: "4º Ano", link: "#" },
-      { name: "5º Ano", link: "#" },
-    ],
-  },
-  {
-    title: "Anos Finais",
-    description: "6º ao 9º Ano do Ensino Fundamental",
-    icon: Layers,
-    color: "slate",
-    turmas: [
-      { name: "6º Ano", link: "#" },
-      { name: "7º Ano", link: "#" },
-      { name: "8º Ano", link: "#" },
-      { name: "9º Ano", link: "#" },
-    ],
-  },
-  {
-    title: "Ensino Médio",
-    description: "1º ao 3º Ano do Ensino Médio",
-    icon: ShieldCheck,
-    color: "red",
-    turmas: [
-      { name: "1º Ano EM", link: "#" },
-      { name: "2º Ano EM", link: "#" },
-      { name: "3º Ano EM", link: "#" },
-    ],
-  },
-];
+const turmasData = {
+  anosIniciais: [
+    { nome: "2º ao 5º Ano", link: "https://chat.whatsapp.com/FyKxKQLc0ulH2zWNDBifjx" }
+  ],
+  fundamentalII: [
+    { nome: "Turma 61", link: "https://chat.whatsapp.com/HoinMwf1QHtHuDYIxq3I2j" },
+    { nome: "Turma 62", link: "https://chat.whatsapp.com/HSrKHFgiP5C3JsTdMHE93Y" },
+    { nome: "Turma 63", link: "https://chat.whatsapp.com/F8wPDn4WddJDmXsQzqr3pb" },
+    { nome: "Turma 64", link: "https://chat.whatsapp.com/Lxf3GaoqnkoBOfmbigkoJ2" },
+    { nome: "Turma 71", link: "https://chat.whatsapp.com/JwVk5xO0PqgJZal7OxlGvo" },
+    { nome: "Turma 72", link: "https://chat.whatsapp.com/CiumYb9ByLRAGEgn3ZFgQG" },
+    { nome: "Turma 73", link: "https://chat.whatsapp.com/LolbrdIMCvCFLXpdBLfgwc" },
+    { nome: "Turma 74", link: "https://chat.whatsapp.com/KByYaG8c4ggBqNZ1RoLa03" },
+    { nome: "Turma 81", link: "https://chat.whatsapp.com/I5Zs07Dg7H2KKHtQ27tM0E" },
+    { nome: "Turma 82", link: "https://chat.whatsapp.com/EkiZ9HoL2VD79E1lITS7df" },
+    { nome: "Turma 83", link: "https://chat.whatsapp.com/BvOA8Ybi0ei3xdlIjhW1JI" },
+    { nome: "Turma 91", link: "https://chat.whatsapp.com/DuRON2A5XWfC7JvDBnGXJN" },
+    { nome: "Turma 92", link: "https://chat.whatsapp.com/IvFS3I3prrE70i7ZlKob4Y" },
+    { nome: "Turma 93", link: "https://chat.whatsapp.com/ECMTjYyfVn2313vn8KMwpk" }
+  ],
+  ensinoMedio: [
+    { nome: "Turma 100", link: "https://chat.whatsapp.com/HWMuegcCLVFI9ee8VGJYHz" },
+    { nome: "Turma 101", link: "https://chat.whatsapp.com/EC0I3OXLbXy3GeEbo5caBC" },
+    { nome: "Turma 102", link: "https://chat.whatsapp.com/CtWM4a5gMAmDJNPJs2YQMI" },
+    { nome: "Turma 103", link: "https://chat.whatsapp.com/LrQn6rDjzyI0nHhNlCpdEf" },
+    { nome: "Turma 104", link: "https://chat.whatsapp.com/IMk6CRW3cOZBsvw6rrbdIw" },
+    { nome: "Turma 105", link: "https://chat.whatsapp.com/HBAFExjkUDgFQxpRUT6J1a" },
+    { nome: "Turma 106", link: "https://chat.whatsapp.com/FohjfgJ9GGK7tcBedeItde" },
+    { nome: "Turma 107", link: "https://chat.whatsapp.com/DwF2v6ZCbSuFZ3i3gOeGgI" },
+    { nome: "Turma 108", link: "https://chat.whatsapp.com/LuspAjYnWc6ILRg4kNpvev" },
+    { nome: "Turma 200", link: "https://chat.whatsapp.com/BckqrDmIcJIEgupP3stRmk" },
+    { nome: "Turma 201", link: "https://chat.whatsapp.com/CS602vEmhcJ9U4MadJMIGp" },
+    { nome: "Turma 202", link: "https://chat.whatsapp.com/EbqC8uSDuwL4Xs6TOesPkt" },
+    { nome: "Turma 203", link: "https://chat.whatsapp.com/La0dcWgq2uSFMjK4Mqw7WB" },
+    { nome: "Turma 204", link: "https://chat.whatsapp.com/H8ewMYJFWga013QM1oJGGb" },
+    { nome: "Turma 205", link: "https://chat.whatsapp.com/ITPXAkuMT6u9Yj1zNikd6e" },
+    { nome: "Turma 300", link: "https://chat.whatsapp.com/Iw4hTCa1ExU9fL0rjtleZj" },
+    { nome: "Turma 301", link: "https://chat.whatsapp.com/LG0P3tWVCJoKmrg4SPFFtU" },
+    { nome: "Turma 302", link: "https://chat.whatsapp.com/JBkQmQVX2PT6XQlZtzz7Ha" }
+  ]
+};
 
 export default function TurmasGrid() {
   return (
-    <section id="grupos" className="py-20 bg-slate-50 dark:bg-slate-900/40 border-y border-slate-200/60 dark:border-slate-800/40">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <section id="turmas" className="max-w-[1200px] mx-auto py-16 w-full">
+      
+      {/* Header */}
+      <div className="mb-12 border-b border-soft-border pb-4">
+        <h2 className="font-display text-2xl md:text-3xl font-bold text-primary mb-2">
+          Nossas Turmas & Grupos de Comunicação
+        </h2>
+        <p className="text-sm text-slate-500 font-semibold">
+          Selecione sua turma para entrar no canal de avisos oficiais do WhatsApp.
+        </p>
+      </div>
+
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         
-        {/* Section Header */}
-        <div className="text-center max-w-3xl mx-auto mb-16 space-y-4">
-          <h2 className="text-3xl sm:text-4xl font-extrabold font-display text-[#1B2F78] dark:text-white">
-            Canais de Comunicação por Turma
-          </h2>
-          <div className="h-1 w-20 bg-[#F90000] mx-auto rounded-full" />
-          <p className="text-slate-600 dark:text-slate-300 font-medium">
-            Selecione a turma correspondente para ingressar no grupo oficial de avisos do WhatsApp. Mantenha-se informado sobre aulas, projetos e reuniões.
-          </p>
+        {/* Category 1: Anos Iniciais */}
+        <div className="bg-white border border-slate-200 shadow-sm rounded-xl p-6 flex flex-col justify-between">
+          <div className="space-y-4">
+            <h3 className="font-display text-lg md:text-xl font-bold text-primary flex items-center gap-2 mb-4">
+              <Smile className="h-5 w-5 text-secondary" />
+              <span>Anos Iniciais</span>
+            </h3>
+            
+            <div className="space-y-3">
+              {turmasData.anosIniciais.map((turma) => (
+                <a
+                  key={turma.nome}
+                  href={turma.link}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="bg-pure-white border border-soft-border rounded-lg p-4 shadow-subtle flex items-center justify-between hover:border-secondary transition-colors cursor-pointer group outline-none"
+                >
+                  <span className="text-sm font-bold text-slate-600 group-hover:text-primary transition-colors">
+                    {turma.nome}
+                  </span>
+                  <div className="flex items-center gap-2 text-slate-400 group-hover:text-secondary transition-colors">
+                    <MessageSquare className="h-4 w-4" />
+                    <ChevronRight className="h-4 w-4" />
+                  </div>
+                </a>
+              ))}
+            </div>
+          </div>
         </div>
 
-        {/* Grid of Níveis */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          {NIVEIS_ENSINO.map((nivel) => {
-            const Icon = nivel.icon;
-            
-            // Setup dynamic visual identity borders/background elements based on school colors
-            const cardStyles = 
-              nivel.color === "blue" 
-                ? "border-t-4 border-t-[#1B2F78]" 
-                : nivel.color === "red" 
-                ? "border-t-4 border-t-[#F90000]" 
-                : "border-t-4 border-t-slate-500";
+        {/* Category 2: Ensino Fundamental II */}
+        <div className="bg-white border border-slate-200 shadow-sm rounded-xl p-6 flex flex-col justify-between">
+          <div className="space-y-4">
+            <h3 className="font-display text-lg md:text-xl font-bold text-primary flex items-center gap-2 mb-4">
+              <BookOpen className="h-5 w-5 text-secondary" />
+              <span>Ensino Fundamental II</span>
+            </h3>
 
-            const iconBg = 
-              nivel.color === "blue"
-                ? "bg-[#1B2F78]/10 text-[#1B2F78]"
-                : nivel.color === "red"
-                ? "bg-[#F90000]/10 text-[#F90000]"
-                : "bg-slate-500/10 text-slate-600 dark:text-slate-300";
-
-            return (
-              <div 
-                key={nivel.title} 
-                className={`bg-white dark:bg-slate-900 rounded-2xl shadow-xl shadow-slate-100 dark:shadow-none p-6 sm:p-8 flex flex-col justify-between border border-slate-100 dark:border-slate-800/50 transition-all duration-300 hover:shadow-2xl hover:shadow-slate-200 dark:hover:shadow-none hover:-translate-y-1 ${cardStyles}`}
-              >
-                <div>
-                  <div className="flex items-center space-x-4 mb-6">
-                    <div className={`p-3 rounded-xl ${iconBg}`}>
-                      <Icon className="h-6 w-6" />
-                    </div>
-                    <div>
-                      <h3 className="font-extrabold text-lg sm:text-xl text-[#1B2F78] dark:text-white">
-                        {nivel.title}
-                      </h3>
-                      <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
-                        {nivel.description}
-                      </p>
-                    </div>
+            <div className="space-y-3 max-h-[350px] overflow-y-auto pr-1">
+              {turmasData.fundamentalII.map((turma) => (
+                <a
+                  key={turma.nome}
+                  href={turma.link}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="bg-pure-white border border-soft-border rounded-lg p-4 shadow-subtle flex items-center justify-between hover:border-secondary transition-colors cursor-pointer group outline-none"
+                >
+                  <span className="text-sm font-bold text-slate-600 group-hover:text-primary transition-colors">
+                    {turma.nome}
+                  </span>
+                  <div className="flex items-center gap-2 text-slate-400 group-hover:text-secondary transition-colors">
+                    <MessageSquare className="h-4 w-4" />
+                    <ChevronRight className="h-4 w-4" />
                   </div>
+                </a>
+              ))}
+            </div>
+          </div>
+        </div>
 
-                  <div className="space-y-3">
-                    {nivel.turmas.map((turma) => (
-                      <a
-                        key={turma.name}
-                        href={turma.link}
-                        className="group flex items-center justify-between p-3.5 rounded-xl border border-slate-100 dark:border-slate-800 hover:border-[#1B2F78]/30 dark:hover:border-white/20 hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-all duration-200 outline-none"
-                      >
-                        <span className="font-semibold text-sm text-slate-700 dark:text-slate-200 group-hover:text-[#1B2F78] dark:group-hover:text-white transition-colors">
-                          {turma.name}
-                        </span>
-                        <div className="flex items-center space-x-2 text-xs text-slate-400 group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors">
-                          <span className="opacity-0 group-hover:opacity-100 transition-opacity font-semibold">Grupo WhatsApp</span>
-                          <MessageSquare className="h-4 w-4 shrink-0" />
-                        </div>
-                      </a>
-                    ))}
+        {/* Category 3: Ensino Médio */}
+        <div className="bg-white border border-slate-200 shadow-sm rounded-xl p-6 flex flex-col justify-between">
+          <div className="space-y-4">
+            <h3 className="font-display text-lg md:text-xl font-bold text-primary flex items-center gap-2 mb-4">
+              <FlaskConical className="h-5 w-5 text-secondary" />
+              <span>Ensino Médio</span>
+            </h3>
+
+            <div className="space-y-3 max-h-[350px] overflow-y-auto pr-1">
+              {turmasData.ensinoMedio.map((turma) => (
+                <a
+                  key={turma.nome}
+                  href={turma.link}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="bg-pure-white border border-soft-border rounded-lg p-4 shadow-subtle flex items-center justify-between hover:border-secondary transition-colors cursor-pointer group outline-none"
+                >
+                  <span className="text-sm font-bold text-slate-600 group-hover:text-primary transition-colors">
+                    {turma.nome}
+                  </span>
+                  <div className="flex items-center gap-2 text-slate-400 group-hover:text-secondary transition-colors">
+                    <MessageSquare className="h-4 w-4" />
+                    <ChevronRight className="h-4 w-4" />
                   </div>
-                </div>
-
-                <div className="mt-8 pt-6 border-t border-slate-100 dark:border-slate-800/60 text-xs text-center text-slate-400">
-                  Grupos moderados pela equipe pedagógica.
-                </div>
-              </div>
-            );
-          })}
+                </a>
+              ))}
+            </div>
+          </div>
         </div>
 
       </div>
