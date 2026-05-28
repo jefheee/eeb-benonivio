@@ -14,7 +14,7 @@ export default function Header() {
 
   return (
     <header className="bg-pure-white border-b border-soft-border shadow-sm sticky top-0 z-50 w-full">
-      <div className="flex justify-between items-center w-full max-w-[1200px] mx-auto px-4 md:px-8 py-4">
+      <div className="flex justify-between items-center w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
         
         {/* Brand */}
         <Link href="/" className="flex items-center gap-3 outline-none">

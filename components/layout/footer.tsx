@@ -16,7 +16,7 @@ export default function Footer() {
         </svg>
       </div>
 
-      <div className="flex flex-col md:flex-row justify-between items-start gap-8 max-w-[1200px] mx-auto px-4 md:px-8 py-12">
+      <div className="flex flex-col md:flex-row justify-between items-start gap-8 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         
         {/* Brand & Contact */}
         <div className="flex flex-col gap-4 max-w-sm">
