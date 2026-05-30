@@ -1,9 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { Inter, Outfit } from "next/font/google";
 import "./globals.css";
-import Header from "@/components/layout/header";
-import Footer from "@/components/layout/footer";
-import ScrollProvider from "@/components/providers/scroll-provider";
 import { SCHOOL_INFO } from "@/lib/constants";
 
 const inter = Inter({
@@ -73,13 +70,7 @@ export default function RootLayout({
   return (
     <html lang="pt-BR" className={`${inter.variable} ${outfit.variable} scroll-smooth`}>
       <body className="font-sans antialiased bg-background text-foreground flex flex-col min-h-screen">
-        <ScrollProvider>
-          <Header />
-          <main className="flex-grow pt-24 max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-8 md:py-12">
-            {children}
-          </main>
-          <Footer />
-        </ScrollProvider>
+        {children}
       </body>
     </html>
   );
