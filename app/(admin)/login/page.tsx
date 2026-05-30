@@ -35,7 +35,7 @@ export default function LoginPage() {
   return (
     <div className="min-h-screen bg-slate-50 flex items-center justify-center p-4">
       <div className="w-full max-w-md bg-white rounded-2xl shadow-subtle border border-slate-100 p-8 space-y-6">
-        
+
         {/* Header */}
         <div className="text-center space-y-2">
           <div className="inline-flex items-center justify-center p-3 bg-[#00185f]/5 text-[#00185f] rounded-2xl mb-2">
@@ -83,7 +83,7 @@ export default function LoginPage() {
           {/* Password Input */}
           <div className="space-y-1.5">
             <label htmlFor="password" className="text-xs font-bold text-slate-700 uppercase tracking-wider block">
-              Senha secreta
+              Senha
             </label>
             <div className="relative">
               <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
