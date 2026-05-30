@@ -1,7 +1,14 @@
 import { MessageSquare, Smile, BookOpen, FlaskConical, ChevronRight } from "lucide-react";
-import { turmasData } from "@/lib/data/turmas";
+import { getTurmasPublic } from "@/lib/data/whatsapp";
 
-export default function TurmasGrid() {
+export default async function TurmasGrid() {
+  const allGroups = await getTurmasPublic();
+
+  // Filter groups dynamically by their category
+  const anosIniciais = allGroups.filter(g => g.serie === 'Anos Iniciais');
+  const fundamentalII = allGroups.filter(g => g.serie === 'Ensino Fundamental II');
+  const ensinoMedio = allGroups.filter(g => g.serie === 'Ensino Médio');
+
   return (
     <section id="turmas" className="max-w-[1200px] mx-auto py-16 w-full">
       
@@ -26,23 +33,50 @@ export default function TurmasGrid() {
             </h3>
             
             <div className="space-y-3">
-              {turmasData.anosIniciais.map((turma) => (
-                <a
-                  key={turma.nome}
-                  href={turma.link}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="bg-pure-white border border-soft-border rounded-lg p-4 shadow-subtle flex items-center justify-between hover:border-secondary transition-colors cursor-pointer group outline-none"
-                >
-                  <span className="text-sm font-bold text-slate-600 group-hover:text-primary transition-colors">
-                    {turma.nome}
-                  </span>
-                  <div className="flex items-center gap-2 text-slate-400 group-hover:text-secondary transition-colors">
-                    <MessageSquare className="h-4 w-4" />
-                    <ChevronRight className="h-4 w-4" />
-                  </div>
-                </a>
-              ))}
+              {anosIniciais.length > 0 ? (
+                anosIniciais.map((turma) => {
+                  const hasValidLink = turma.link && turma.link.startsWith('http');
+
+                  if (hasValidLink) {
+                    return (
+                      <a
+                        key={turma.id}
+                        href={turma.link}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="bg-pure-white border border-soft-border rounded-lg p-4 shadow-subtle flex items-center justify-between hover:border-secondary transition-colors cursor-pointer group outline-none"
+                      >
+                        <span className="text-sm font-bold text-slate-600 group-hover:text-primary transition-colors">
+                          {turma.turma}
+                        </span>
+                        <div className="flex items-center gap-2 text-slate-400 group-hover:text-secondary transition-colors">
+                          <span className="text-[10px] font-bold text-slate-400">{turma.turno}</span>
+                          <MessageSquare className="h-4 w-4 shrink-0" />
+                          <ChevronRight className="h-4 w-4 shrink-0" />
+                        </div>
+                      </a>
+                    );
+                  } else {
+                    return (
+                      <div
+                        key={turma.id}
+                        className="bg-slate-50 border border-dashed border-slate-200 rounded-lg p-4 opacity-60 flex items-center justify-between cursor-not-allowed select-none"
+                        title="Link indisponível no momento"
+                      >
+                        <span className="text-sm font-bold text-slate-400">
+                          {turma.turma}
+                        </span>
+                        <div className="flex items-center gap-2 text-slate-300">
+                          <span className="text-[10px] font-bold text-slate-350">{turma.turno}</span>
+                          <MessageSquare className="h-4 w-4 shrink-0" />
+                        </div>
+                      </div>
+                    );
+                  }
+                })
+              ) : (
+                <p className="text-xs text-slate-400 font-medium py-4 text-center">Nenhuma turma registrada.</p>
+              )}
             </div>
           </div>
         </div>
@@ -56,23 +90,50 @@ export default function TurmasGrid() {
             </h3>
 
             <div className="space-y-3 max-h-[350px] overflow-y-auto pr-1">
-              {turmasData.fundamentalII.map((turma) => (
-                <a
-                  key={turma.nome}
-                  href={turma.link}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="bg-pure-white border border-soft-border rounded-lg p-4 shadow-subtle flex items-center justify-between hover:border-secondary transition-colors cursor-pointer group outline-none"
-                >
-                  <span className="text-sm font-bold text-slate-600 group-hover:text-primary transition-colors">
-                    {turma.nome}
-                  </span>
-                  <div className="flex items-center gap-2 text-slate-400 group-hover:text-secondary transition-colors">
-                    <MessageSquare className="h-4 w-4" />
-                    <ChevronRight className="h-4 w-4" />
-                  </div>
-                </a>
-              ))}
+              {fundamentalII.length > 0 ? (
+                fundamentalII.map((turma) => {
+                  const hasValidLink = turma.link && turma.link.startsWith('http');
+
+                  if (hasValidLink) {
+                    return (
+                      <a
+                        key={turma.id}
+                        href={turma.link}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="bg-pure-white border border-soft-border rounded-lg p-4 shadow-subtle flex items-center justify-between hover:border-secondary transition-colors cursor-pointer group outline-none"
+                      >
+                        <span className="text-sm font-bold text-slate-600 group-hover:text-primary transition-colors">
+                          {turma.turma}
+                        </span>
+                        <div className="flex items-center gap-2 text-slate-400 group-hover:text-secondary transition-colors">
+                          <span className="text-[10px] font-bold text-slate-400">{turma.turno}</span>
+                          <MessageSquare className="h-4 w-4 shrink-0" />
+                          <ChevronRight className="h-4 w-4 shrink-0" />
+                        </div>
+                      </a>
+                    );
+                  } else {
+                    return (
+                      <div
+                        key={turma.id}
+                        className="bg-slate-50 border border-dashed border-slate-200 rounded-lg p-4 opacity-60 flex items-center justify-between cursor-not-allowed select-none"
+                        title="Link indisponível no momento"
+                      >
+                        <span className="text-sm font-bold text-slate-400">
+                          {turma.turma}
+                        </span>
+                        <div className="flex items-center gap-2 text-slate-300">
+                          <span className="text-[10px] font-bold text-slate-350">{turma.turno}</span>
+                          <MessageSquare className="h-4 w-4 shrink-0" />
+                        </div>
+                      </div>
+                    );
+                  }
+                })
+              ) : (
+                <p className="text-xs text-slate-400 font-medium py-4 text-center">Nenhuma turma registrada.</p>
+              )}
             </div>
           </div>
         </div>
@@ -86,23 +147,50 @@ export default function TurmasGrid() {
             </h3>
 
             <div className="space-y-3 max-h-[350px] overflow-y-auto pr-1">
-              {turmasData.ensinoMedio.map((turma) => (
-                <a
-                  key={turma.nome}
-                  href={turma.link}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="bg-pure-white border border-soft-border rounded-lg p-4 shadow-subtle flex items-center justify-between hover:border-secondary transition-colors cursor-pointer group outline-none"
-                >
-                  <span className="text-sm font-bold text-slate-600 group-hover:text-primary transition-colors">
-                    {turma.nome}
-                  </span>
-                  <div className="flex items-center gap-2 text-slate-400 group-hover:text-secondary transition-colors">
-                    <MessageSquare className="h-4 w-4" />
-                    <ChevronRight className="h-4 w-4" />
-                  </div>
-                </a>
-              ))}
+              {ensinoMedio.length > 0 ? (
+                ensinoMedio.map((turma) => {
+                  const hasValidLink = turma.link && turma.link.startsWith('http');
+
+                  if (hasValidLink) {
+                    return (
+                      <a
+                        key={turma.id}
+                        href={turma.link}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="bg-pure-white border border-soft-border rounded-lg p-4 shadow-subtle flex items-center justify-between hover:border-secondary transition-colors cursor-pointer group outline-none"
+                      >
+                        <span className="text-sm font-bold text-slate-600 group-hover:text-primary transition-colors">
+                          {turma.turma}
+                        </span>
+                        <div className="flex items-center gap-2 text-slate-400 group-hover:text-secondary transition-colors">
+                          <span className="text-[10px] font-bold text-slate-400">{turma.turno}</span>
+                          <MessageSquare className="h-4 w-4 shrink-0" />
+                          <ChevronRight className="h-4 w-4 shrink-0" />
+                        </div>
+                      </a>
+                    );
+                  } else {
+                    return (
+                      <div
+                        key={turma.id}
+                        className="bg-slate-50 border border-dashed border-slate-200 rounded-lg p-4 opacity-60 flex items-center justify-between cursor-not-allowed select-none"
+                        title="Link indisponível no momento"
+                      >
+                        <span className="text-sm font-bold text-slate-400">
+                          {turma.turma}
+                        </span>
+                        <div className="flex items-center gap-2 text-slate-300">
+                          <span className="text-[10px] font-bold text-slate-350">{turma.turno}</span>
+                          <MessageSquare className="h-4 w-4 shrink-0" />
+                        </div>
+                      </div>
+                    );
+                  }
+                })
+              ) : (
+                <p className="text-xs text-slate-400 font-medium py-4 text-center">Nenhuma turma registrada.</p>
+              )}
             </div>
           </div>
         </div>

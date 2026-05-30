@@ -73,9 +73,30 @@ export default function Footer() {
             © {currentYear} {SCHOOL_INFO.name}.<br />
             Educação Pública de Qualidade.
           </p>
-          <div className="flex items-center gap-2 text-xs text-slate-400 bg-white border border-soft-border px-3 py-1.5 rounded-lg w-fit">
-            <ShieldCheck className="h-4 w-4 text-[#F90000] shrink-0" />
-            <span>MEC: {SCHOOL_INFO.inep}</span>
+          <div className="flex items-center gap-3 flex-wrap md:justify-end">
+            <div className="flex items-center gap-2 text-xs text-slate-400 bg-white border border-soft-border px-3 py-1.5 rounded-lg w-fit">
+              <ShieldCheck className="h-4 w-4 text-[#F90000] shrink-0" />
+              <span>MEC: {SCHOOL_INFO.inep}</span>
+            </div>
+            <Link
+              href="/login"
+              className="flex items-center gap-1.5 text-xs text-slate-400 hover:text-[#00185f] bg-white border border-soft-border px-3 py-1.5 rounded-lg w-fit transition-colors font-semibold outline-none"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2.5"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                className="h-3 w-3 text-slate-400"
+              >
+                <rect width="18" height="11" x="3" y="11" rx="2" ry="2" />
+                <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+              </svg>
+              <span>Área Restrita</span>
+            </Link>
           </div>
         </div>
 
