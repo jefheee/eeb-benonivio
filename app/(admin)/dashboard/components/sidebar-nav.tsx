@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { LayoutDashboard, MessageSquareCode, FileArchive, Megaphone } from 'lucide-react';
+import { LayoutDashboard, Megaphone, FileArchive, Users, BellRing, Laptop } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 export default function SidebarNav() {
@@ -15,19 +15,29 @@ export default function SidebarNav() {
       icon: LayoutDashboard,
     },
     {
-      href: '/dashboard/whatsapp',
-      label: 'Grupos de WhatsApp',
-      icon: MessageSquareCode,
+      href: '/dashboard/turmas',
+      label: 'Turmas e Recados',
+      icon: Users,
     },
     {
       href: '/dashboard/avisos',
-      label: 'Mural de Avisos',
+      label: 'Mural de Novidades',
       icon: Megaphone,
+    },
+    {
+      href: '/dashboard/notificacoes',
+      label: 'Notificações Globais',
+      icon: BellRing,
     },
     {
       href: '/dashboard/documentos',
       label: 'Documentos Públicos',
       icon: FileArchive,
+    },
+    {
+      href: '/dashboard/paginas',
+      label: 'Conteúdo de Páginas',
+      icon: Laptop,
     },
   ];
 

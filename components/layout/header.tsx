@@ -1,16 +1,18 @@
-"use client";
+'use client';
 
 import { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
-import { MessageSquare, Menu, X } from "lucide-react";
+import { MessageSquare, Menu, X, Mail } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { SCHOOL_INFO, NAV_ITEMS } from "@/lib/constants";
+import { useWhatsAppDialog } from "@/components/providers/whatsapp-dialog-provider";
 
 export default function Header() {
   const [isOpen, setIsOpen] = useState(false);
   const pathname = usePathname();
+  const { openWhatsAppDialog } = useWhatsAppDialog();
 
   return (
     <header className="bg-pure-white border-b border-soft-border shadow-sm sticky top-0 z-50 w-full">
@@ -56,15 +58,20 @@ export default function Header() {
 
         {/* Trailing CTA (Right Column / Mobile menu button) */}
         <div className="flex justify-end items-center gap-4">
-          <a
-            href={SCHOOL_INFO.whatsapp}
-            target="_blank"
-            rel="noopener noreferrer"
+          <div className="hidden lg:flex flex-col text-right pr-2">
+            <span className="text-[10px] text-slate-400 font-bold block uppercase leading-none">Dúvidas? E-mail</span>
+            <a href="mailto:benonivio@sed.sc.gov.br" className="text-xs text-slate-500 font-bold hover:text-secondary mt-0.5">
+              benonivio@sed.sc.gov.br
+            </a>
+          </div>
+
+          <button
+            onClick={openWhatsAppDialog}
             className="bg-secondary text-white px-6 py-2.5 rounded hover:opacity-90 transition-all shadow-sm hidden md:flex items-center gap-2 text-sm font-bold outline-none"
           >
             <MessageSquare className="h-4 w-4" />
             <span>Secretaria / WhatsApp</span>
-          </a>
+          </button>
 
           {/* Mobile Menu Button */}
           <button
@@ -109,19 +116,24 @@ export default function Header() {
 
         {/* Mobile CTA */}
         <div className="mt-auto space-y-4">
-          <a
-            href={SCHOOL_INFO.whatsapp}
-            target="_blank"
-            rel="noopener noreferrer"
-            onClick={() => setIsOpen(false)}
-            className="w-full justify-center inline-flex items-center space-x-2 bg-secondary text-white font-bold p-4 rounded-xl transition-all shadow-md"
+          <button
+            onClick={() => {
+              setIsOpen(false);
+              openWhatsAppDialog();
+            }}
+            className="w-full justify-center inline-flex items-center space-x-2 bg-secondary text-white font-bold p-4 rounded-xl transition-all shadow-md outline-none"
           >
             <MessageSquare className="h-5 w-5" />
             <span>Secretaria (WhatsApp)</span>
-          </a>
+          </button>
+          
           <div className="text-center text-xs text-slate-500">
             <p className="font-bold text-primary">{SCHOOL_INFO.name}</p>
             <p className="mt-1">{SCHOOL_INFO.address.full}</p>
+            <p className="mt-1.5 text-slate-400 font-bold flex items-center justify-center gap-1">
+              <Mail className="h-3.5 w-3.5" />
+              <span>benonivio@sed.sc.gov.br</span>
+            </p>
           </div>
         </div>
       </div>

@@ -1,6 +1,6 @@
 import Link from "next/link";
 import Image from "next/image";
-import { Phone, ShieldCheck } from "lucide-react";
+import { Phone, ShieldCheck, Mail } from "lucide-react";
 import { InstagramIcon } from "@/components/ui/icons";
 import { SCHOOL_INFO, NAV_ITEMS } from "@/lib/constants";
 
@@ -36,11 +36,19 @@ export default function Footer() {
             {SCHOOL_INFO.address.street}, {SCHOOL_INFO.address.number} - {SCHOOL_INFO.address.neighborhood}<br />
             CEP: {SCHOOL_INFO.address.zipCode} - {SCHOOL_INFO.address.city}/{SCHOOL_INFO.address.state}
           </p>
-          <div className="flex items-center gap-2 text-primary font-semibold text-sm mt-1">
-            <Phone className="h-4 w-4 text-secondary" />
-            <a href={`tel:${SCHOOL_INFO.phone.replace(/\D/g, "")}`} className="hover:underline">
-              {SCHOOL_INFO.phone}
-            </a>
+          <div className="space-y-1.5">
+            <div className="flex items-center gap-2 text-primary font-semibold text-sm">
+              <Phone className="h-4 w-4 text-secondary" />
+              <a href={`tel:${SCHOOL_INFO.phone.replace(/\D/g, "")}`} className="hover:underline">
+                {SCHOOL_INFO.phone}
+              </a>
+            </div>
+            <div className="flex items-center gap-2 text-primary font-semibold text-sm">
+              <Mail className="h-4 w-4 text-secondary" />
+              <a href="mailto:benonivio@sed.sc.gov.br" className="hover:underline">
+                benonivio@sed.sc.gov.br
+              </a>
+            </div>
           </div>
         </div>
 

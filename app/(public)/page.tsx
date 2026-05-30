@@ -10,12 +10,31 @@ import {
   ChevronRight,
   Smile
 } from "lucide-react";
-import { SCHOOL_INFO } from "@/lib/constants";
 import { getAvisosDestaqueHome } from "@/lib/data/avisos";
+import { getPaginaConteudoPublic } from "@/lib/data/paginas";
 import AvisosCarousel from "@/components/features/avisos-carousel";
+import WhatsAppTrigger from "@/components/features/whatsapp-trigger";
+
+export const dynamic = 'force-dynamic';
+
+const DEFAULT_HOME_HERO = {
+  badge: 'Matrículas Abertas 2026',
+  titulo: 'Bem-vindo à E.E.B Prof. Benonívio João Martins',
+  paragrafo: 'Educação de excelência, focada na formação de cidadãos conscientes e preparados para o futuro. Um espaço dedicado ao desenvolvimento integral do aluno.',
+};
 
 export default async function Home() {
   const featuredNotices = await getAvisosDestaqueHome();
+  const heroContentRaw = await getPaginaConteudoPublic('home_hero');
+  
+  let heroContent = DEFAULT_HOME_HERO;
+  if (heroContentRaw?.conteudo_html) {
+    try {
+      heroContent = { ...DEFAULT_HOME_HERO, ...JSON.parse(heroContentRaw.conteudo_html) };
+    } catch (e) {
+      console.error('Erro ao parsear home_hero:', e);
+    }
+  }
 
   return (
     <div className="bg-pure-white text-slate-text min-h-screen flex flex-col relative overflow-hidden">
@@ -32,24 +51,27 @@ export default async function Home() {
         </svg>
       </div>
 
+      {/* Mural de Avisos Carrossel (Topo/Hero) */}
+      <AvisosCarousel avisos={featuredNotices} />
+
       {/* Hero Section */}
-      <section className="w-full bg-pure-white py-20 md:py-32 px-4 md:px-8 flex flex-col items-center justify-center text-center relative overflow-hidden">
+      <section className="w-full bg-pure-white py-16 md:py-24 px-4 md:px-8 flex flex-col items-center justify-center text-center relative overflow-hidden border-b border-soft-border">
         <div className="max-w-[800px] mx-auto flex flex-col items-center z-10">
 
           {/* Badge */}
           <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-surface-container-low border border-soft-border text-secondary font-semibold text-xs mb-8 shadow-sm">
             <GraduationCap className="h-4 w-4" />
-            <span>Matrículas Abertas 2026</span>
+            <span>{heroContent.badge}</span>
           </div>
 
           {/* Title */}
           <h1 className="font-display text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-primary mb-6 leading-tight">
-            Bem-vindo à E.E.B Prof. Benonívio João Martins
+            {heroContent.titulo}
           </h1>
 
           {/* Paragraph */}
           <p className="text-base sm:text-lg md:text-xl text-slate-500 max-w-[640px] mb-10 font-medium leading-relaxed">
-            Educação de excelência, focada na formação de cidadãos conscientes e preparados para o futuro. Um espaço dedicado ao desenvolvimento integral do aluno.
+            {heroContent.paragrafo}
           </p>
 
           {/* CTAs */}
@@ -60,22 +82,16 @@ export default async function Home() {
             >
               Conheça a Escola
             </Link>
-            <a
-              href={SCHOOL_INFO.whatsapp}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="bg-pure-white text-primary border border-primary font-semibold px-8 py-3 rounded shadow-subtle hover:bg-surface-container-low transition-all text-center flex items-center justify-center gap-2"
+            <WhatsAppTrigger
+              className="bg-pure-white text-primary border border-primary font-semibold px-8 py-3 rounded shadow-subtle hover:bg-surface-container-low transition-all text-center flex items-center justify-center gap-2 outline-none"
             >
               <MessageSquare className="h-4 w-4" />
               <span>Fale Conosco</span>
-            </a>
+            </WhatsAppTrigger>
           </div>
 
         </div>
       </section>
-
-      {/* Mural de Avisos Carrossel */}
-      <AvisosCarousel avisos={featuredNotices} />
 
       {/* Quick Access (Bento Style Cards) */}
       <section className="max-w-[1200px] mx-auto px-4 md:px-8 py-16 relative w-full">
@@ -98,13 +114,10 @@ export default async function Home() {
           </Link>
 
           {/* Card 2 - Contato */}
-          <a
-            href={SCHOOL_INFO.whatsapp}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="bg-pure-white border border-soft-border rounded-xl p-8 shadow-subtle hover:shadow-md hover:border-secondary transition-all duration-300 group flex flex-col items-center text-center gap-4 outline-none"
+          <WhatsAppTrigger
+            className="bg-pure-white border border-soft-border rounded-xl p-8 shadow-subtle hover:shadow-md hover:border-secondary transition-all duration-300 group flex flex-col items-center text-center gap-4 outline-none text-slate-text"
           >
-            <div className="w-16 h-16 rounded-full bg-surface-container-low flex items-center justify-center text-secondary group-hover:scale-110 transition-transform">
+            <div className="w-16 h-16 rounded-full bg-surface-container-low flex items-center justify-center text-secondary group-hover:scale-110 transition-transform mx-auto">
               <PhoneCall className="h-8 w-8" />
             </div>
             <div>
@@ -113,7 +126,7 @@ export default async function Home() {
                 Fale com a secretaria, direção ou coordenação pedagógica via WhatsApp.
               </p>
             </div>
-          </a>
+          </WhatsAppTrigger>
 
           {/* Card 3 - Histórico */}
           <Link

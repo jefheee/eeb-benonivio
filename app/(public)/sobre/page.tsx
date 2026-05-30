@@ -1,8 +1,37 @@
 import Image from "next/image";
 import { MapPin, Award, BookOpen, Users, Zap, Globe, Music } from "lucide-react";
 import { SCHOOL_INFO } from "@/lib/constants";
+import { getPaginaConteudoPublic } from "@/lib/data/paginas";
 
-export default function SobrePage() {
+export const dynamic = 'force-dynamic';
+
+const DEFAULT_SOBRE = {
+  patronoNome: 'Professor Benonívio João Martins',
+  patronoAnos: '1933 - 1978',
+  patronoBio: 'O professor Benonívio João Martins foi um profissional exemplar da educação catarinense e uma importante figura de liderança comunitária na região da Grande Florianópolis. Nascido em 1933 e falecido precocemente em 1978, deixou um legado inestimável focado no bem-estar comunitário, cidadania ativa e incentivo à leitura.\n\nSua memória é honrada através desta escola, inspirando gerações de alunos a trilharem o caminho da responsabilidade e do aprendizado no Brejaru. A instituição carrega no nome e no dia a dia os valores de solidariedade, persistência e busca pelo saber.',
+  codigoMec: '42004047',
+  totalAlunos: '1.897',
+  alunosMatutino: '431',
+  alunosVespertino: '399',
+  alunosNoturno: '274',
+  alunosIntegral: '245',
+  infraEnergia: 'Alimentação pública estabilizada em 220V.',
+  infraConectividade: 'Internet dedicada distribuída em Rede Local de alta velocidade.',
+  infraCultura: 'Fanfarra escolar e projetos pedagógicos artísticos históricos.',
+};
+
+export default async function SobrePage() {
+  const contentRaw = await getPaginaConteudoPublic('sobre');
+  
+  let sobre = DEFAULT_SOBRE;
+  if (contentRaw?.conteudo_html) {
+    try {
+      sobre = { ...DEFAULT_SOBRE, ...JSON.parse(contentRaw.conteudo_html) };
+    } catch (e) {
+      console.error('Erro ao parsear sobre_content:', e);
+    }
+  }
+
   return (
     <div className="py-6 space-y-12">
       
@@ -40,15 +69,12 @@ export default function SobrePage() {
               <div className="space-y-4 text-sm text-slate-600 font-medium leading-relaxed">
                 <div className="bg-[#1B2F78]/5 p-4 rounded-xl border-l-4 border-l-primary">
                   <span className="text-xs text-primary font-bold uppercase block">Nome Oficial</span>
-                  <span className="text-lg text-slate-900 font-extrabold block">Professor Benonívio João Martins</span>
-                  <span className="text-xs text-slate-500 font-bold block mt-0.5">(1933 - 1978)</span>
+                  <span className="text-lg text-slate-900 font-extrabold block">{sobre.patronoNome}</span>
+                  <span className="text-xs text-slate-500 font-bold block mt-0.5">({sobre.patronoAnos})</span>
                 </div>
-                <p>
-                  O professor Benonívio João Martins foi um profissional exemplar da educação catarinense e uma importante figura de liderança comunitária na região da Grande Florianópolis. Nascido em 1933 e falecido precocemente em 1978, deixou um legado inestimável focado no bem-estar comunitário, cidadania ativa e incentivo à leitura.
-                </p>
-                <p>
-                  Sua memória é honrada através desta escola, inspirando gerações de alunos a trilharem o caminho da responsabilidade e do aprendizado no Brejaru. A instituição carrega no nome e no dia a dia os valores de solidariedade, persistência e busca pelo saber.
-                </p>
+                <div className="whitespace-pre-wrap">
+                  {sobre.patronoBio}
+                </div>
               </div>
             </div>
           </div>
@@ -64,12 +90,12 @@ export default function SobrePage() {
             <div className="space-y-4">
               <div>
                 <span className="text-xs text-slate-400 font-bold block uppercase">Código MEC / INEP</span>
-                <span className="text-lg text-slate-900 font-extrabold">42004047</span>
+                <span className="text-lg text-slate-900 font-extrabold">{sobre.codigoMec}</span>
               </div>
               
               <div className="border-t pt-4">
                 <span className="text-xs text-slate-400 font-bold block uppercase mb-2">Total de Alunos (2026)</span>
-                <span className="text-3xl font-extrabold text-primary">1.897</span>
+                <span className="text-3xl font-extrabold text-primary">{sobre.totalAlunos}</span>
                 <span className="text-xs text-slate-500 font-semibold block mt-1">Alunos ativos matriculados</span>
               </div>
 
@@ -78,19 +104,19 @@ export default function SobrePage() {
                 <div className="grid grid-cols-2 gap-2 text-xs font-semibold text-slate-600">
                   <div className="bg-slate-50 p-2 rounded-lg">
                     <span className="block text-slate-400">Matutino</span>
-                    <span className="text-slate-900 font-bold">431 alunos</span>
+                    <span className="text-slate-900 font-bold">{sobre.alunosMatutino} alunos</span>
                   </div>
                   <div className="bg-slate-50 p-2 rounded-lg">
                     <span className="block text-slate-400">Vespertino</span>
-                    <span className="text-slate-900 font-bold">399 alunos</span>
+                    <span className="text-slate-900 font-bold">{sobre.alunosVespertino} alunos</span>
                   </div>
                   <div className="bg-slate-50 p-2 rounded-lg">
                     <span className="block text-slate-400">Noturno</span>
-                    <span className="text-slate-900 font-bold">274 alunos</span>
+                    <span className="text-slate-900 font-bold">{sobre.alunosNoturno} alunos</span>
                   </div>
                   <div className="bg-slate-50 p-2 rounded-lg">
                     <span className="block text-slate-400">Integral</span>
-                    <span className="text-slate-900 font-bold">245 alunos</span>
+                    <span className="text-slate-900 font-bold">{sobre.alunosIntegral} alunos</span>
                   </div>
                 </div>
               </div>
@@ -112,7 +138,7 @@ export default function SobrePage() {
                 </div>
                 <div>
                   <span className="text-slate-900 font-bold block">Rede de Energia</span>
-                  <span>Alimentação pública estabilizada em 220V.</span>
+                  <span>{sobre.infraEnergia}</span>
                 </div>
               </li>
               <li className="flex items-start gap-3">
@@ -121,7 +147,7 @@ export default function SobrePage() {
                 </div>
                 <div>
                   <span className="text-slate-900 font-bold block">Conectividade Local</span>
-                  <span>Internet dedicada distribuída em Rede Local de alta velocidade.</span>
+                  <span>{sobre.infraConectividade}</span>
                 </div>
               </li>
               <li className="flex items-start gap-3">
@@ -130,7 +156,7 @@ export default function SobrePage() {
                 </div>
                 <div>
                   <span className="text-slate-900 font-bold block">Atividades Culturais</span>
-                  <span>Fanfarra escolar e projetos pedagógicos artísticos históricos.</span>
+                  <span>{sobre.infraCultura}</span>
                 </div>
               </li>
             </ul>
