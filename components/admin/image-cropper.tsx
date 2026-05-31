@@ -2,7 +2,7 @@
 
 import { useState, useRef, useEffect, ChangeEvent } from 'react';
 import { createClient } from '@/lib/supabase/client';
-import { Image as ImageIcon, Sliders, Check, Loader2, RefreshCw } from 'lucide-react';
+import { Check, Loader2, RefreshCw, X, Upload } from 'lucide-react';
 
 interface ImageCropperProps {
   onUploadSuccess: (url: string) => void;
@@ -17,16 +17,16 @@ export default function ImageCropper({
   aspectRatio = 16 / 9,
   bucketName = 'escola_midias',
   folderName = 'banners',
-  label = 'Imagem do Comunicado'
+  label = 'Adicionar Imagem'
 }: ImageCropperProps) {
-  const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [imageSrc, setImageSrc] = useState<string | null>(null);
   const [zoom, setZoom] = useState<number>(1);
   const [xOffset, setXOffset] = useState<number>(0);
   const [yOffset, setYOffset] = useState<number>(0);
   const [isUploading, setIsUploading] = useState<boolean>(false);
-  const [uploadSuccess, setUploadSuccess] = useState<boolean>(false);
-  
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const imgRef = useRef<HTMLImageElement | null>(null);
 
@@ -35,7 +35,6 @@ export default function ImageCropper({
     if (e.target.files && e.target.files.length > 0) {
       const file = e.target.files[0];
       setSelectedFile(file);
-      setUploadSuccess(false);
 
       const reader = new FileReader();
       reader.onload = () => {
@@ -69,7 +68,7 @@ export default function ImageCropper({
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
 
-    // Set output canvas size (fixed 800x450 for 16:9 ratio)
+    // Set output canvas size (fixed 800 width, height proportional to aspect ratio)
     const targetWidth = 800;
     const targetHeight = targetWidth / aspectRatio;
     canvas.width = targetWidth;
@@ -77,7 +76,6 @@ export default function ImageCropper({
 
     ctx.clearRect(0, 0, targetWidth, targetHeight);
 
-    // Calculate dimensions to fit/cover
     const imgWidth = img.width;
     const imgHeight = img.height;
 
@@ -91,11 +89,19 @@ export default function ImageCropper({
     const drawWidth = imgWidth * finalScale;
     const drawHeight = imgHeight * finalScale;
 
-    // Center image + apply offsets
+    // Center image + apply offsets (multiplied by zoom factor for finer control)
     const dx = (targetWidth - drawWidth) / 2 + xOffset * 3;
     const dy = (targetHeight - drawHeight) / 2 + yOffset * 3;
 
     ctx.drawImage(img, dx, dy, drawWidth, drawHeight);
+  };
+
+  const handleClose = () => {
+    setImageSrc(null);
+    setSelectedFile(null);
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
+    }
   };
 
   // Convert canvas to blob and upload to Supabase Storage
@@ -138,8 +144,8 @@ export default function ImageCropper({
           .from(bucketName)
           .getPublicUrl(data.path);
 
-        setUploadSuccess(true);
         onUploadSuccess(publicUrl);
+        handleClose();
       } catch (err: unknown) {
         console.error('Erro no upload da imagem:', err);
         const errMsg = err instanceof Error ? err.message : String(err);
@@ -150,135 +156,150 @@ export default function ImageCropper({
     }, 'image/jpeg', 0.85); // Compress as JPEG at 85% quality
   };
 
+  const triggerFileInput = () => {
+    if (fileInputRef.current) {
+      fileInputRef.current.click();
+    }
+  };
+
   return (
-    <div className="bg-slate-50 border border-slate-200 rounded-2xl p-5 space-y-4">
-      <div className="flex items-center justify-between">
-        <span className="text-xs font-bold text-slate-700 uppercase tracking-wider block">
-          {label}
-        </span>
-        {uploadSuccess && (
-          <span className="text-xs font-bold text-emerald-600 flex items-center gap-1">
-            <Check className="h-4 w-4" />
-            Salvo
-          </span>
-        )}
-      </div>
+    <div>
+      {/* Hidden native input */}
+      <input
+        type="file"
+        accept="image/*"
+        onChange={handleFileChange}
+        ref={fileInputRef}
+        className="hidden"
+      />
 
-      {!imageSrc ? (
-        // Dropzone / File Picker
-        <label className="border-2 border-dashed border-slate-350 hover:border-[#00185f] rounded-xl p-8 flex flex-col items-center justify-center gap-2 cursor-pointer transition-colors bg-white group shadow-sm">
-          <input
-            type="file"
-            accept="image/*"
-            onChange={handleFileChange}
-            className="hidden"
-          />
-          <div className="p-3 bg-slate-50 text-slate-400 group-hover:text-[#00185f] rounded-full transition-colors">
-            <ImageIcon className="h-6 w-6" />
-          </div>
-          <span className="text-sm font-semibold text-slate-600 group-hover:text-[#00185f] transition-colors">
-            Selecionar Imagem do Computador
-          </span>
-          <span className="text-xs text-slate-400">Suporta JPG, PNG e WEBP</span>
-        </label>
-      ) : (
-        // Cropper Controls and Canvas Preview
-        <div className="space-y-4">
-          {/* Preview Container */}
-          <div className="relative border border-slate-200 bg-black rounded-xl overflow-hidden shadow-inner flex items-center justify-center">
-            <canvas
-              ref={canvasRef}
-              className="max-w-full h-auto aspect-video object-contain"
-            />
-            {isUploading && (
-              <div className="absolute inset-0 bg-black/60 flex items-center justify-center text-white gap-2">
-                <Loader2 className="h-6 w-6 animate-spin text-white" />
-                <span className="text-sm font-bold">Enviando imagem...</span>
+      {/* Primary Trigger Button */}
+      <button
+        type="button"
+        onClick={triggerFileInput}
+        className="flex items-center justify-center gap-2 border border-[#00185f] hover:bg-[#00185f]/5 text-[#00185f] text-xs font-bold py-2 px-4 rounded-xl transition-all shadow-sm outline-none w-full sm:w-auto"
+      >
+        <Upload className="h-4 w-4 text-[#00185f]" />
+        <span>{label}</span>
+      </button>
+
+      {/* Immediate Crop Modal */}
+      {imageSrc && (
+        <div className="fixed inset-0 z-[100] bg-black/60 flex items-center justify-center p-4 overflow-y-auto">
+          <div className="bg-white rounded-2xl border border-slate-100 shadow-2xl p-6 max-w-md w-full space-y-4 animate-scaleIn text-left">
+            {/* Header */}
+            <div className="flex items-center justify-between border-b pb-3">
+              <div>
+                <h4 className="font-display font-extrabold text-[#00185f] text-sm">
+                  Recortar e Ajustar Imagem
+                </h4>
+                <p className="text-[10px] text-slate-400 font-semibold mt-0.5">Defina o enquadramento usando os controles abaixo.</p>
               </div>
-            )}
-          </div>
-
-          {/* Adjustments Panel */}
-          <div className="bg-white border border-slate-150 rounded-xl p-4 space-y-3">
-            <div className="flex items-center gap-2 text-xs font-bold text-[#00185f] uppercase tracking-wider border-b border-slate-100 pb-2">
-              <Sliders className="h-4 w-4 text-slate-500" />
-              <span>Ajustes de Enquadramento</span>
+              <button
+                type="button"
+                onClick={handleClose}
+                disabled={isUploading}
+                className="p-1 hover:bg-slate-100 rounded-lg text-slate-400 hover:text-slate-655 transition-colors disabled:opacity-50"
+              >
+                <X className="h-5 w-5" />
+              </button>
             </div>
 
-            {/* Zoom Slider */}
-            <div className="space-y-1">
-              <div className="flex justify-between text-xs font-bold text-slate-500">
-                <span>Zoom</span>
-                <span>{Math.round(zoom * 100)}%</span>
-              </div>
-              <input
-                type="range"
-                min="1"
-                max="3"
-                step="0.05"
-                value={zoom}
-                onChange={(e) => setZoom(parseFloat(e.target.value))}
-                className="w-full h-1.5 bg-slate-150 rounded-lg appearance-none cursor-pointer accent-[#00185f]"
+            {/* Canvas Container */}
+            <div className="relative border border-slate-200 bg-slate-900 rounded-xl overflow-hidden shadow-inner flex items-center justify-center">
+              <canvas
+                ref={canvasRef}
+                className="max-w-full h-auto max-h-[220px] object-contain"
               />
+              {isUploading && (
+                <div className="absolute inset-0 bg-black/75 flex flex-col items-center justify-center text-white gap-2">
+                  <Loader2 className="h-6 w-6 animate-spin text-white" />
+                  <span className="text-xs font-bold">Enviando imagem ao servidor...</span>
+                </div>
+              )}
             </div>
 
-            {/* Position X Slider */}
-            <div className="space-y-1">
-              <div className="flex justify-between text-xs font-bold text-slate-500">
-                <span>Posição Horizontal (X)</span>
-                <span>{xOffset}px</span>
+            {/* Position Sliders */}
+            <div className="bg-slate-50 border border-slate-150 rounded-xl p-4 space-y-3">
+              {/* Zoom */}
+              <div className="space-y-1">
+                <div className="flex justify-between text-[11px] font-bold text-slate-550">
+                  <span>Aproximação (Zoom)</span>
+                  <span>{Math.round(zoom * 100)}%</span>
+                </div>
+                <input
+                  type="range"
+                  min="1"
+                  max="3"
+                  step="0.02"
+                  value={zoom}
+                  onChange={(e) => setZoom(parseFloat(e.target.value))}
+                  disabled={isUploading}
+                  className="w-full h-1.5 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-[#00185f] disabled:opacity-50"
+                />
               </div>
-              <input
-                type="range"
-                min="-150"
-                max="150"
-                step="2"
-                value={xOffset}
-                onChange={(e) => setXOffset(parseInt(e.target.value))}
-                className="w-full h-1.5 bg-slate-150 rounded-lg appearance-none cursor-pointer accent-[#00185f]"
-              />
+
+              {/* Horizontal Offset */}
+              <div className="space-y-1">
+                <div className="flex justify-between text-[11px] font-bold text-slate-550">
+                  <span>Ajuste Horizontal (X)</span>
+                  <span>{xOffset}px</span>
+                </div>
+                <input
+                  type="range"
+                  min="-150"
+                  max="150"
+                  step="1"
+                  value={xOffset}
+                  onChange={(e) => setXOffset(parseInt(e.target.value))}
+                  disabled={isUploading}
+                  className="w-full h-1.5 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-[#00185f] disabled:opacity-50"
+                />
+              </div>
+
+              {/* Vertical Offset */}
+              <div className="space-y-1">
+                <div className="flex justify-between text-[11px] font-bold text-slate-550">
+                  <span>Ajuste Vertical (Y)</span>
+                  <span>{yOffset}px</span>
+                </div>
+                <input
+                  type="range"
+                  min="-150"
+                  max="150"
+                  step="1"
+                  value={yOffset}
+                  onChange={(e) => setYOffset(parseInt(e.target.value))}
+                  disabled={isUploading}
+                  className="w-full h-1.5 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-[#00185f] disabled:opacity-50"
+                />
+              </div>
             </div>
 
-            {/* Position Y Slider */}
-            <div className="space-y-1">
-              <div className="flex justify-between text-xs font-bold text-slate-500">
-                <span>Posição Vertical (Y)</span>
-                <span>{yOffset}px</span>
-              </div>
-              <input
-                type="range"
-                min="-150"
-                max="150"
-                step="2"
-                value={yOffset}
-                onChange={(e) => setYOffset(parseInt(e.target.value))}
-                className="w-full h-1.5 bg-slate-150 rounded-lg appearance-none cursor-pointer accent-[#00185f]"
-              />
+            {/* Action buttons */}
+            <div className="flex items-center gap-3 justify-end pt-2 border-t border-slate-100">
+              <label className="px-4 py-2 border border-slate-200 hover:bg-slate-100 rounded-lg text-xs font-bold text-slate-600 cursor-pointer transition-colors flex items-center gap-1.5 outline-none select-none disabled:opacity-50">
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={handleFileChange}
+                  disabled={isUploading}
+                  className="hidden"
+                />
+                <RefreshCw className="h-3.5 w-3.5" />
+                <span>Trocar</span>
+              </label>
+
+              <button
+                type="button"
+                onClick={handleUpload}
+                disabled={isUploading}
+                className="bg-[#00185f] hover:bg-[#001144] disabled:opacity-50 text-white text-xs font-bold px-5 py-2 rounded-lg shadow-sm transition-colors flex items-center gap-1.5 outline-none"
+              >
+                <Check className="h-3.5 w-3.5" />
+                <span>Recortar & Upload</span>
+              </button>
             </div>
-          </div>
-
-          {/* Action buttons */}
-          <div className="flex items-center gap-3 justify-end">
-            <label className="px-4 py-2 border border-slate-200 hover:bg-slate-100 rounded-lg text-xs font-bold text-slate-650 cursor-pointer transition-colors flex items-center gap-1.5 outline-none select-none">
-              <input
-                type="file"
-                accept="image/*"
-                onChange={handleFileChange}
-                className="hidden"
-              />
-              <RefreshCw className="h-3.5 w-3.5" />
-              <span>Trocar Imagem</span>
-            </label>
-
-            <button
-              type="button"
-              onClick={handleUpload}
-              disabled={isUploading}
-              className="bg-[#00185f] hover:bg-[#001144] disabled:opacity-50 text-white text-xs font-bold px-5 py-2 rounded-lg shadow-sm transition-colors flex items-center gap-1.5 outline-none"
-            >
-              <Check className="h-3.5 w-3.5" />
-              <span>Confirmar & Recortar</span>
-            </button>
           </div>
         </div>
       )}

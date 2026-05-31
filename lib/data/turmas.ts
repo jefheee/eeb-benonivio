@@ -22,7 +22,9 @@ export interface EscolaTurmaPostPublic {
   conteudo: string | null;
   anexos: string[] | null;
   imagem_url: string | null;
+  imagens: string[] | null;
   link_referencia: string | null;
+  data_publicacao: string;
   created_at: string;
 }
 
@@ -82,11 +84,15 @@ export const getTurmaByIdPublic = unstable_cache(
 
 export const getTurmaPostsPublic = unstable_cache(
   async (turmaId: string) => {
+    const nowStr = new Date().toISOString();
     const { data, error } = await supabasePublic
       .from('escola_turmas_posts')
-      .select('id, turma_id, titulo, conteudo, anexos, imagem_url, link_referencia, created_at')
+      .select('id, turma_id, titulo, conteudo, anexos, imagem_url, imagens, link_referencia, data_publicacao, created_at')
       .eq('turma_id', turmaId)
-      .order('created_at', { ascending: false });
+      .eq('status', 'ativo')
+      .lte('data_publicacao', nowStr)
+      .or(`data_expiracao.is.null,data_expiracao.gt.${nowStr}`)
+      .order('data_publicacao', { ascending: false });
 
     if (error) {
       console.error(`Erro ao buscar posts da turma ${turmaId}:`, error);
@@ -98,5 +104,6 @@ export const getTurmaPostsPublic = unstable_cache(
   ['turma-posts-list'],
   {
     tags: ['turmas-posts', 'turmas'],
+    revalidate: 60
   }
 );

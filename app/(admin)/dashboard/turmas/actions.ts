@@ -20,8 +20,22 @@ export interface EscolaTurmaPost {
   conteudo: string | null;
   anexos: string[];
   imagem_url: string | null;
+  imagens: string[] | null;
   link_referencia: string | null;
+  data_publicacao: string;
+  data_expiracao: string | null;
+  status: string;
   created_at: string;
+}
+
+function getStoragePathFromUrl(url: string, bucketName: string = 'escola_midias'): string | null {
+  if (!url) return null;
+  const matchStr = `${bucketName}/`;
+  const index = url.indexOf(matchStr);
+  if (index !== -1) {
+    return url.substring(index + matchStr.length);
+  }
+  return null;
 }
 
 // ---------------- TURMAS ACTIONS ----------------
@@ -129,7 +143,7 @@ export async function getPostsAdmin(turmaId: string) {
     .from('escola_turmas_posts')
     .select('*')
     .eq('turma_id', turmaId)
-    .order('created_at', { ascending: false });
+    .order('data_publicacao', { ascending: false });
 
   if (error) {
     throw new Error(`Erro ao buscar posts da turma: ${error.message}`);
@@ -143,36 +157,45 @@ export async function savePost(prevState: unknown, formData: FormData) {
   const turma_id = formData.get('turma_id') as string;
   const titulo = formData.get('titulo') as string;
   const conteudo = formData.get('conteudo') as string;
-  const anexos_raw = formData.get('anexos') as string;
-  const imagem_url = (formData.get('imagem_url') as string) || null;
   const link_referencia = (formData.get('link_referencia') as string) || null;
+  const imagensRaw = formData.get('imagens') as string;
+  const data_publicacao = (formData.get('data_publicacao') as string) || new Date().toISOString();
+  const data_expiracao = (formData.get('data_expiracao') as string) || null;
+  const status = (formData.get('status') as string) || 'ativo';
 
-  let anexos = [];
-  if (anexos_raw) {
+  let imagens: string[] = [];
+  if (imagensRaw) {
     try {
-      anexos = JSON.parse(anexos_raw);
+      imagens = JSON.parse(imagensRaw);
     } catch {
-      return { error: 'Formato de anexos inválido.' };
+      return { error: 'Formato de imagens inválido.' };
     }
   }
+
+  const imagem_url = imagens.length > 0 ? imagens[0] : null;
 
   if (!turma_id || !titulo) {
     return { error: 'Turma ID e Título são obrigatórios.' };
   }
 
   const supabase = createClient();
+  const postData = {
+    turma_id,
+    titulo,
+    conteudo,
+    link_referencia,
+    imagem_url,
+    imagens,
+    data_publicacao,
+    data_expiracao,
+    status,
+  };
 
   if (id) {
     // Update
     const { error } = await supabase
       .from('escola_turmas_posts')
-      .update({
-        titulo,
-        conteudo,
-        anexos,
-        imagem_url,
-        link_referencia,
-      })
+      .update(postData)
       .eq('id', id);
 
     if (error) {
@@ -180,14 +203,7 @@ export async function savePost(prevState: unknown, formData: FormData) {
     }
   } else {
     // Insert
-    const { error } = await supabase.from('escola_turmas_posts').insert({
-      turma_id,
-      titulo,
-      conteudo,
-      anexos,
-      imagem_url,
-      link_referencia,
-    });
+    const { error } = await supabase.from('escola_turmas_posts').insert(postData);
 
     if (error) {
       return { error: `Erro ao criar post: ${error.message}` };
@@ -202,12 +218,84 @@ export async function savePost(prevState: unknown, formData: FormData) {
   return { success: true };
 }
 
-export async function deletePost(id: string, turmaId: string) {
+export async function moveToTrashPost(id: string, turmaId: string) {
   const supabase = createClient();
-  const { error } = await supabase.from('escola_turmas_posts').delete().eq('id', id);
+  const { error } = await supabase
+    .from('escola_turmas_posts')
+    .update({ status: 'lixeira' })
+    .eq('id', id);
 
   if (error) {
-    return { error: `Erro ao excluir post: ${error.message}` };
+    return { error: `Erro ao mover recado para a lixeira: ${error.message}` };
+  }
+
+  revalidateTag(`turmas-posts-${turmaId}`);
+  revalidateTag('turmas-posts');
+  revalidatePath(`/turmas/${turmaId}`);
+  revalidatePath('/dashboard/turmas');
+
+  return { success: true };
+}
+
+export async function restorePost(id: string, turmaId: string) {
+  const supabase = createClient();
+  const { error } = await supabase
+    .from('escola_turmas_posts')
+    .update({ status: 'ativo' })
+    .eq('id', id);
+
+  if (error) {
+    return { error: `Erro ao restaurar recado: ${error.message}` };
+  }
+
+  revalidateTag(`turmas-posts-${turmaId}`);
+  revalidateTag('turmas-posts');
+  revalidatePath(`/turmas/${turmaId}`);
+  revalidatePath('/dashboard/turmas');
+
+  return { success: true };
+}
+
+export async function deletePostPermanently(id: string, turmaId: string) {
+  const supabase = createClient();
+
+  // 1. Fetch images to delete from Storage
+  const { data: post, error: fetchError } = await supabase
+    .from('escola_turmas_posts')
+    .select('imagens')
+    .eq('id', id)
+    .single();
+
+  if (fetchError) {
+    return { error: `Erro ao localizar imagens do recado: ${fetchError.message}` };
+  }
+
+  // 2. Delete row from DB
+  const { error: deleteError } = await supabase
+    .from('escola_turmas_posts')
+    .delete()
+    .eq('id', id);
+
+  if (deleteError) {
+    return { error: `Erro ao excluir recado do banco de dados: ${deleteError.message}` };
+  }
+
+  // 3. Delete files from Storage
+  const imagens: string[] = (post?.imagens as string[]) || [];
+  if (imagens && imagens.length > 0) {
+    const storagePaths = imagens
+      .map(url => getStoragePathFromUrl(url))
+      .filter((path): path is string => !!path);
+
+    if (storagePaths.length > 0) {
+      const { error: storageError } = await supabase.storage
+        .from('escola_midias')
+        .remove(storagePaths);
+
+      if (storageError) {
+        console.error('Erro ao remover mídias órfãs do recado:', storageError);
+      }
+    }
   }
 
   revalidateTag(`turmas-posts-${turmaId}`);

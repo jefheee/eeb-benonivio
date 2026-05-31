@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { LayoutDashboard, Megaphone, FileArchive, Users, BellRing, Laptop } from 'lucide-react';
+import { LayoutDashboard, Megaphone, FileArchive, Users, BellRing, Laptop, History } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 export default function SidebarNav() {
@@ -28,6 +28,11 @@ export default function SidebarNav() {
       href: '/dashboard/notificacoes',
       label: 'Notificações Globais',
       icon: BellRing,
+    },
+    {
+      href: '/dashboard/acervo',
+      label: 'Acervo Histórico',
+      icon: History,
     },
     {
       href: '/dashboard/documentos',

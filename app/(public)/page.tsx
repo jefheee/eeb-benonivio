@@ -102,11 +102,6 @@ export default async function Home() {
         </svg>
       </div>
 
-      {/* Mural de Avisos Carrossel (Topo/Hero) */}
-      {heroContent.mostrar_avisos && featuredNotices.length > 0 && (
-        <AvisosCarousel avisos={featuredNotices} />
-      )}
-
       {/* Hero Section */}
       {heroContent.mostrar_hero && (
         <section className="w-full bg-pure-white py-16 md:py-24 px-4 md:px-8 flex flex-col items-center justify-center text-center relative overflow-hidden border-b border-soft-border">
@@ -147,6 +142,13 @@ export default async function Home() {
             </div>
 
           </div>
+        </section>
+      )}
+
+      {/* Mural de Avisos Carrossel (Abaixo do Hero, flutuante bg-[#0B1B42]) */}
+      {heroContent.mostrar_avisos && featuredNotices.length > 0 && (
+        <section className="container mx-auto my-12 rounded-[2rem] bg-[#0B1B42] p-8 md:p-12 text-white shadow-2xl">
+          <AvisosCarousel avisos={featuredNotices} />
         </section>
       )}
 

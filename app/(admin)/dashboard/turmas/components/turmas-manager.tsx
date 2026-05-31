@@ -2,8 +2,8 @@
 
 import { useState, useTransition } from 'react';
 import { useFormState, useFormStatus } from 'react-dom';
-import { Plus, Search, Edit2, Trash2, X, AlertCircle, CheckCircle2, MessageSquare, Megaphone, Link as LinkIcon } from 'lucide-react';
-import { EscolaTurma, EscolaTurmaPost, saveTurma, deleteTurma, getPostsAdmin, savePost, deletePost } from '../actions';
+import { Plus, Search, Edit2, Trash2, X, AlertCircle, CheckCircle2, MessageSquare, Megaphone, Link as LinkIcon, RotateCcw, Trash } from 'lucide-react';
+import { EscolaTurma, EscolaTurmaPost, saveTurma, deleteTurma, getPostsAdmin, savePost, moveToTrashPost, restorePost, deletePostPermanently } from '../actions';
 import ImageCropper from '@/components/admin/image-cropper';
 
 interface ManagerProps {
@@ -14,6 +14,14 @@ const formInitialState = {
   error: null as string | null,
   success: false as boolean,
 };
+
+function formatISOForDateTimeLocal(isoString?: string) {
+  if (!isoString) return '';
+  const date = new Date(isoString);
+  const tzOffset = date.getTimezoneOffset() * 60000;
+  const localISODate = new Date(date.getTime() - tzOffset).toISOString();
+  return localISODate.slice(0, 16); // YYYY-MM-DDTHH:MM
+}
 
 export default function TurmasManager({ initialTurmas }: ManagerProps) {
   const [turmas, setTurmas] = useState<EscolaTurma[]>(initialTurmas);
@@ -27,11 +35,16 @@ export default function TurmasManager({ initialTurmas }: ManagerProps) {
   // Posts Feed state for a selected class
   const [selectedTurmaForPosts, setSelectedTurmaForPosts] = useState<EscolaTurma | null>(null);
   const [posts, setPosts] = useState<EscolaTurmaPost[]>([]);
-  const [isPostFormOpen, setIsPostFormOpen] = useState(false);
+  const [postActiveTab, setPostActiveTab] = useState<'ativos' | 'lixeira'>('ativos');
+
+  // New post states
   const [newPostTitulo, setNewPostTitulo] = useState('');
   const [newPostConteudo, setNewPostConteudo] = useState('');
-  const [postImagemUrl, setPostImagemUrl] = useState('');
   const [postLinkReferencia, setPostLinkReferencia] = useState('');
+  const [postImagens, setPostImagens] = useState<string[]>([]);
+  const [postDataPublicacao, setPostDataPublicacao] = useState('');
+  const [postDataExpiracao, setPostDataExpiracao] = useState('');
+  const [postStatus, setPostStatus] = useState('ativo');
 
   const [, startTransition] = useTransition();
   const [feedback, setFeedback] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
@@ -43,7 +56,6 @@ export default function TurmasManager({ initialTurmas }: ManagerProps) {
 
   // Form State for Turma Save
   const [turmaFormState, turmaFormAction] = useFormState(async (state: unknown, formData: FormData) => {
-    // Append the JSON serialized other links to formData
     formData.append('outros_links', JSON.stringify(outrosLinks));
     const res = await saveTurma(state, formData);
     if (res.success) {
@@ -61,16 +73,23 @@ export default function TurmasManager({ initialTurmas }: ManagerProps) {
   const [postFormState, postFormAction] = useFormState(async (state: unknown, formData: FormData) => {
     if (!selectedTurmaForPosts) return { error: 'Turma não selecionada.', success: false };
     formData.append('turma_id', selectedTurmaForPosts.id);
-    formData.append('imagem_url', postImagemUrl);
+    formData.append('imagens', JSON.stringify(postImagens));
     formData.append('link_referencia', postLinkReferencia);
+    formData.append('data_publicacao', postDataPublicacao ? new Date(postDataPublicacao).toISOString() : new Date().toISOString());
+    formData.append('data_expiracao', postDataExpiracao ? new Date(postDataExpiracao).toISOString() : '');
+    formData.append('status', postStatus);
+
     const res = await savePost(state, formData);
     if (res.success) {
-      setIsPostFormOpen(false);
       setNewPostTitulo('');
       setNewPostConteudo('');
-      setPostImagemUrl('');
       setPostLinkReferencia('');
+      setPostImagens([]);
+      setPostDataPublicacao(formatISOForDateTimeLocal(new Date().toISOString()));
+      setPostDataExpiracao('');
+      setPostStatus('ativo');
       showFeedback('success', 'Recado publicado com sucesso!');
+      
       // Refresh posts list
       const freshPosts = await getPostsAdmin(selectedTurmaForPosts.id);
       setPosts(freshPosts);
@@ -115,7 +134,15 @@ export default function TurmasManager({ initialTurmas }: ManagerProps) {
   const handleOpenPosts = (turma: EscolaTurma) => {
     setSelectedTurmaForPosts(turma);
     setPosts([]);
-    setIsPostFormOpen(false);
+    setPostActiveTab('ativos');
+    setPostImagens([]);
+    setPostLinkReferencia('');
+    setNewPostTitulo('');
+    setNewPostConteudo('');
+    setPostDataPublicacao(formatISOForDateTimeLocal(new Date().toISOString()));
+    setPostDataExpiracao('');
+    setPostStatus('ativo');
+    
     startTransition(async () => {
       try {
         const data = await getPostsAdmin(turma.id);
@@ -126,16 +153,50 @@ export default function TurmasManager({ initialTurmas }: ManagerProps) {
     });
   };
 
-  const handleDeletePost = (postId: string) => {
+  // Soft delete post
+  const handleSoftDeletePost = (postId: string) => {
     if (!selectedTurmaForPosts) return;
-    if (confirm('Tem certeza que deseja excluir este recado?')) {
+    if (confirm('Tem certeza que deseja mover este recado para a lixeira?')) {
       startTransition(async () => {
-        const res = await deletePost(postId, selectedTurmaForPosts.id);
+        const res = await moveToTrashPost(postId, selectedTurmaForPosts.id);
         if (res.success) {
-          setPosts(posts.filter(p => p.id !== postId));
-          showFeedback('success', 'Recado excluído com sucesso!');
+          showFeedback('success', 'Recado movido para a lixeira!');
+          const freshPosts = await getPostsAdmin(selectedTurmaForPosts.id);
+          setPosts(freshPosts);
         } else {
-          showFeedback('error', res.error || 'Erro ao excluir.');
+          showFeedback('error', res.error || 'Erro ao mover para a lixeira.');
+        }
+      });
+    }
+  };
+
+  // Restore post
+  const handleRestorePost = (postId: string) => {
+    if (!selectedTurmaForPosts) return;
+    startTransition(async () => {
+      const res = await restorePost(postId, selectedTurmaForPosts.id);
+      if (res.success) {
+        showFeedback('success', 'Recado restaurado com sucesso!');
+        const freshPosts = await getPostsAdmin(selectedTurmaForPosts.id);
+        setPosts(freshPosts);
+      } else {
+        showFeedback('error', res.error || 'Erro ao restaurar.');
+      }
+    });
+  };
+
+  // Hard delete post
+  const handleHardDeletePost = (postId: string) => {
+    if (!selectedTurmaForPosts) return;
+    if (confirm('Deseja excluir definitivamente este recado e apagar todas as fotos associadas do storage? Esta ação é irreversível.')) {
+      startTransition(async () => {
+        const res = await deletePostPermanently(postId, selectedTurmaForPosts.id);
+        if (res.success) {
+          showFeedback('success', 'Recado e mídias excluídos permanentemente!');
+          const freshPosts = await getPostsAdmin(selectedTurmaForPosts.id);
+          setPosts(freshPosts);
+        } else {
+          showFeedback('error', res.error || 'Erro ao excluir definitivamente.');
         }
       });
     }
@@ -147,12 +208,20 @@ export default function TurmasManager({ initialTurmas }: ManagerProps) {
     t.turno.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
+  // Filter posts based on active post tab
+  const filteredPosts = posts.filter(p => {
+    if (postActiveTab === 'lixeira') {
+      return p.status === 'lixeira';
+    }
+    return p.status !== 'lixeira';
+  });
+
   return (
     <div className="space-y-6">
       
       {/* Toast Feedback */}
       {feedback && (
-        <div className={`fixed bottom-5 right-5 z-50 p-4 rounded-xl shadow-lg border flex items-center gap-3 max-w-sm animate-fadeIn ${
+        <div className={`fixed bottom-5 right-5 z-[120] p-4 rounded-xl shadow-lg border flex items-center gap-3 max-w-sm animate-fadeIn ${
           feedback.type === 'success' 
             ? 'bg-emerald-50 border-emerald-200 text-emerald-800' 
             : 'bg-red-50 border-red-200 text-red-800'
@@ -452,7 +521,7 @@ export default function TurmasManager({ initialTurmas }: ManagerProps) {
       {/* MODAL 2: Recados / Turma Posts Feed Manager */}
       {selectedTurmaForPosts && (
         <div className="fixed inset-0 z-50 bg-black/45 flex items-center justify-center p-4">
-          <div className="bg-white rounded-2xl shadow-xl border border-slate-100 w-full max-w-3xl overflow-hidden max-h-[90vh] flex flex-col animate-scaleIn">
+          <div className="bg-white rounded-2xl shadow-xl border border-slate-100 w-full max-w-4xl overflow-hidden max-h-[90vh] flex flex-col animate-scaleIn">
             
             {/* Header */}
             <div className="px-6 py-4 border-b border-slate-100 flex items-center justify-between shrink-0">
@@ -464,7 +533,7 @@ export default function TurmasManager({ initialTurmas }: ManagerProps) {
               </div>
               <button 
                 onClick={() => setSelectedTurmaForPosts(null)}
-                className="p-1 hover:bg-slate-100 rounded-lg text-slate-400 hover:text-slate-650 transition-colors"
+                className="p-1 hover:bg-slate-100 rounded-lg text-slate-400 hover:text-slate-655 transition-colors"
               >
                 <X className="h-5 w-5" />
               </button>
@@ -475,16 +544,17 @@ export default function TurmasManager({ initialTurmas }: ManagerProps) {
               {/* Left Side: Create Announcement */}
               <div className="bg-slate-50 border border-slate-150 rounded-xl p-5 space-y-4 h-fit">
                 <h4 className="font-bold text-[#00185f] text-sm border-b border-slate-200 pb-2">
-                  {isPostFormOpen ? 'Escrever Recado' : 'Publicar Recado'}
+                  Publicar Novo Recado
                 </h4>
                 
-                <form action={postFormAction} className="space-y-4">
+                <form action={postFormAction} className="space-y-3.5">
                   {postFormState?.error && (
                     <div className="bg-red-50 border border-red-200 text-red-700 p-3 rounded-lg text-xs font-semibold">
                       {postFormState.error}
                     </div>
                   )}
 
+                  {/* Title */}
                   <div className="space-y-1">
                     <label className="text-[10px] font-bold text-slate-650 uppercase block">Título do Recado</label>
                     <input
@@ -494,100 +564,233 @@ export default function TurmasManager({ initialTurmas }: ManagerProps) {
                       placeholder="Ex: Tarefa de História para 12/06"
                       value={newPostTitulo}
                       onChange={(e) => setNewPostTitulo(e.target.value)}
-                      className="w-full px-3 py-2 bg-white border border-slate-200 rounded-lg text-xs outline-none"
+                      className="w-full px-3 py-2 bg-white border border-slate-200 rounded-lg text-xs outline-none focus:border-[#00185f] font-semibold"
                     />
                   </div>
 
+                  {/* Content */}
                   <div className="space-y-1">
                     <label className="text-[10px] font-bold text-slate-655 uppercase block">Conteúdo / Recado</label>
                     <textarea
                       name="conteudo"
                       required
-                      rows={4}
+                      rows={3}
                       placeholder="Escreva a mensagem completa..."
                       value={newPostConteudo}
                       onChange={(e) => setNewPostConteudo(e.target.value)}
-                      className="w-full px-3 py-2 bg-white border border-slate-200 rounded-lg text-xs outline-none resize-none"
+                      className="w-full px-3 py-2 bg-white border border-slate-200 rounded-lg text-xs outline-none resize-none focus:border-[#00185f]"
                     />
                   </div>
 
+                  {/* Link */}
                   <div className="space-y-1">
-                    <label className="text-[10px] font-bold text-slate-655 uppercase block">Link de Referência / Anexo (Opcional)</label>
+                    <label className="text-[10px] font-bold text-slate-655 uppercase block">Link de Referência (Opcional)</label>
                     <input
                       name="link_referencia"
                       type="url"
                       placeholder="https://exemplo.com/material"
                       value={postLinkReferencia}
                       onChange={(e) => setPostLinkReferencia(e.target.value)}
-                      className="w-full px-3 py-2 bg-white border border-slate-200 rounded-lg text-xs outline-none"
+                      className="w-full px-3 py-2 bg-white border border-slate-200 rounded-lg text-xs outline-none focus:border-[#00185f]"
                     />
                   </div>
 
-                  <div className="space-y-2">
-                    <label className="text-[10px] font-bold text-slate-655 uppercase block">Imagem do Recado (Opcional - Cortada 16:9)</label>
-                    <ImageCropper
-                      onUploadSuccess={(url) => {
-                        setPostImagemUrl(url);
-                        showFeedback('success', 'Imagem do recado carregada!');
-                      }}
-                      aspectRatio={16 / 9}
-                      bucketName="escola_midias"
-                      folderName="posts"
-                      label="Selecionar Foto"
-                    />
-                    <input type="hidden" name="imagem_url" value={postImagemUrl} />
+                  {/* Date fields */}
+                  <div className="grid grid-cols-2 gap-2">
+                    <div className="space-y-1">
+                      <label className="text-[9px] font-bold text-slate-650 uppercase block">Publicação</label>
+                      <input
+                        type="datetime-local"
+                        value={postDataPublicacao}
+                        onChange={(e) => setPostDataPublicacao(e.target.value)}
+                        className="w-full px-2 py-1.5 bg-white border border-slate-200 rounded-lg text-xs outline-none"
+                      />
+                    </div>
+                    <div className="space-y-1">
+                      <label className="text-[9px] font-bold text-slate-650 uppercase block">Expiração</label>
+                      <input
+                        type="datetime-local"
+                        value={postDataExpiracao}
+                        onChange={(e) => setPostDataExpiracao(e.target.value)}
+                        className="w-full px-2 py-1.5 bg-white border border-slate-200 rounded-lg text-xs outline-none"
+                      />
+                    </div>
                   </div>
 
-                  <SubmitButton label="Publicar no Mural" />
+                  {/* Status select */}
+                  <div className="space-y-1">
+                    <label className="text-[9px] font-bold text-slate-650 uppercase block">Status</label>
+                    <select
+                      value={postStatus}
+                      onChange={(e) => setPostStatus(e.target.value)}
+                      className="w-full px-3 py-1.5 bg-white border border-slate-200 rounded-lg text-xs outline-none"
+                    >
+                      <option value="ativo">Ativo</option>
+                      <option value="arquivado">Arquivado</option>
+                      <option value="lixeira">Lixeira</option>
+                    </select>
+                  </div>
+
+                  {/* Multiple image gallery uploads */}
+                  <div className="space-y-2 pt-1">
+                    <label className="text-[10px] font-bold text-slate-655 uppercase block">Imagens do Recado (Até 5, 16:9)</label>
+                    <div className="bg-white border border-slate-200 p-3 rounded-lg space-y-2">
+                      <div className="flex flex-wrap gap-2">
+                        {postImagens.map((url, idx) => (
+                          <div key={idx} className="relative w-16 h-10 border border-slate-300 rounded overflow-hidden shadow-sm flex items-center justify-center">
+                            {/* eslint-disable-next-line @next/next/no-img-element */}
+                            <img src={url} alt={`Post ${idx}`} className="w-full h-full object-cover" />
+                            <button
+                              type="button"
+                              onClick={() => setPostImagens(postImagens.filter((_, i) => i !== idx))}
+                              className="absolute top-0 right-0 bg-[#bc0100] text-white rounded-full p-0.5"
+                            >
+                              <X className="w-2.5 h-2.5" />
+                            </button>
+                          </div>
+                        ))}
+                        {postImagens.length < 5 && (
+                          <div className="w-16 h-10 border border-dashed border-slate-350 rounded flex items-center justify-center bg-slate-50 hover:bg-white hover:border-[#00185f] transition-all">
+                            <ImageCropper
+                              onUploadSuccess={(url) => {
+                                setPostImagens([...postImagens, url]);
+                                showFeedback('success', 'Imagem inserida no recado!');
+                              }}
+                              aspectRatio={16 / 9}
+                              bucketName="escola_midias"
+                              folderName="posts"
+                              label="+"
+                            />
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+
+                  <SubmitButton label="Publicar Recado" />
                 </form>
               </div>
 
-              {/* Right Side: Timeline/Feed */}
-              <div className="space-y-4 flex flex-col overflow-y-auto max-h-[50vh]">
-                <h4 className="font-bold text-[#00185f] text-sm border-b border-slate-200 pb-2 shrink-0">
-                  Histórico de Publicações ({posts.length})
-                </h4>
+              {/* Right Side: Timeline/Feed with Tab filter */}
+              <div className="space-y-4 flex flex-col h-[520px]">
+                {/* Switch Tabs for posts */}
+                <div className="flex items-center justify-between border-b border-slate-200 pb-1.5 shrink-0">
+                  <div className="flex gap-3">
+                    <button
+                      type="button"
+                      onClick={() => setPostActiveTab('ativos')}
+                      className={`pb-1 text-xs font-bold border-b-2 px-1 ${
+                        postActiveTab === 'ativos'
+                          ? 'border-[#00185f] text-[#00185f]'
+                          : 'border-transparent text-slate-400 hover:text-slate-600'
+                      }`}
+                    >
+                      Recados Ativos
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setPostActiveTab('lixeira')}
+                      className={`pb-1 text-xs font-bold border-b-2 px-1 flex items-center gap-1 ${
+                        postActiveTab === 'lixeira'
+                          ? 'border-[#bc0100] text-[#bc0100]'
+                          : 'border-transparent text-slate-400 hover:text-slate-600'
+                      }`}
+                    >
+                      <Trash className="h-3 w-3" />
+                      <span>Lixeira ({posts.filter(p => p.status === 'lixeira').length})</span>
+                    </button>
+                  </div>
+                </div>
 
                 <div className="space-y-3 flex-grow overflow-y-auto pr-1">
-                  {posts.length > 0 ? (
-                    posts.map((post) => (
+                  {filteredPosts.length > 0 ? (
+                    filteredPosts.map((post) => (
                       <div key={post.id} className="bg-white border border-slate-150 rounded-xl p-4 space-y-2 shadow-sm relative group hover:border-[#00185f] transition-all">
                         <div className="flex items-start justify-between">
-                          <span className="text-[10px] font-bold text-slate-400">
-                            {new Date(post.created_at).toLocaleDateString('pt-BR', {
+                          <span className="text-[10px] font-bold text-slate-400 flex flex-col">
+                            <span>Publicação: {new Date(post.data_publicacao || post.created_at).toLocaleDateString('pt-BR', {
                               day: '2-digit',
                               month: '2-digit',
                               year: '2-digit',
                               hour: '2-digit',
                               minute: '2-digit'
-                            })}
+                            })}</span>
+                            {post.data_expiracao && (
+                              <span className="text-red-500">Expira: {new Date(post.data_expiracao).toLocaleDateString('pt-BR', {
+                                day: '2-digit',
+                                month: '2-digit',
+                                year: '2-digit',
+                                hour: '2-digit',
+                                minute: '2-digit'
+                              })}</span>
+                            )}
                           </span>
-                          <button
-                            onClick={() => handleDeletePost(post.id)}
-                            className="text-red-500 hover:text-red-700 opacity-0 group-hover:opacity-100 transition-opacity"
-                            title="Deletar recado"
-                          >
-                            <Trash2 className="h-4 w-4" />
-                          </button>
+                          
+                          {/* Post actions depending on Trash Tab */}
+                          {postActiveTab === 'ativos' ? (
+                            <button
+                              type="button"
+                              onClick={() => handleSoftDeletePost(post.id)}
+                              className="text-[#bc0100] hover:text-red-700 opacity-0 group-hover:opacity-100 transition-opacity p-1 rounded hover:bg-red-50"
+                              title="Mover para Lixeira"
+                            >
+                              <Trash2 className="h-4 w-4" />
+                            </button>
+                          ) : (
+                            <div className="flex gap-1.5">
+                              <button
+                                type="button"
+                                onClick={() => handleRestorePost(post.id)}
+                                className="text-emerald-600 hover:text-emerald-700 p-1 rounded hover:bg-emerald-50"
+                                title="Restaurar Recado"
+                              >
+                                <RotateCcw className="h-4 w-4" />
+                              </button>
+                              <button
+                                type="button"
+                                onClick={() => handleHardDeletePost(post.id)}
+                                className="text-red-650 hover:text-red-800 p-1 rounded hover:bg-red-100"
+                                title="Excluir Definitivamente"
+                              >
+                                <Trash2 className="h-4 w-4" />
+                              </button>
+                            </div>
+                          )}
                         </div>
-                        <h5 className="font-bold text-[#00185f] text-sm leading-snug">{post.titulo}</h5>
+                        <div className="flex items-center gap-2">
+                          <h5 className="font-bold text-[#00185f] text-sm leading-snug">{post.titulo}</h5>
+                          <span className={`text-[9px] px-1.5 py-0.2 rounded font-bold uppercase border ${
+                            post.status === 'arquivado'
+                              ? 'bg-slate-100 text-slate-500 border-slate-200'
+                              : 'bg-emerald-50 text-emerald-700 border-emerald-200'
+                          }`}>
+                            {post.status}
+                          </span>
+                        </div>
                         <p className="text-slate-600 text-xs leading-relaxed whitespace-pre-wrap">{post.conteudo}</p>
-                        {post.imagem_url && (
-                          <div className="mt-2 rounded-lg overflow-hidden border border-slate-100 max-h-32">
-                            {/* eslint-disable-next-line @next/next/no-img-element */}
-                            <img src={post.imagem_url} alt={post.titulo} className="w-full h-full object-cover" />
+                        
+                        {/* Imagens (Gallery layout) */}
+                        {((post.imagens as string[]) || (post.imagem_url ? [post.imagem_url] : [])).length > 0 && (
+                          <div className="grid grid-cols-3 gap-2 mt-2">
+                            {((post.imagens as string[]) || (post.imagem_url ? [post.imagem_url] : [])).map((url, i) => (
+                              <div key={i} className="rounded-lg overflow-hidden border border-slate-200 h-16 bg-slate-50">
+                                {/* eslint-disable-next-line @next/next/no-img-element */}
+                                <img src={url} alt={`Foto recado ${i}`} className="w-full h-full object-cover" />
+                              </div>
+                            ))}
                           </div>
                         )}
+
                         {post.link_referencia && (
-                          <div className="mt-1 flex items-center gap-1 text-[11px] font-bold text-[#00185f] hover:underline">
-                            <LinkIcon className="h-3 w-3" />
-                            <a href={post.link_referencia} target="_blank" rel="noopener noreferrer" className="truncate max-w-[200px]">{post.link_referencia}</a>
+                          <div className="mt-1.5 flex items-center gap-1 text-[11px] font-bold text-[#00185f] hover:underline">
+                            <LinkIcon className="h-3 w-3 shrink-0" />
+                            <a href={post.link_referencia} target="_blank" rel="noopener noreferrer" className="truncate max-w-[220px]">{post.link_referencia}</a>
                           </div>
                         )}
                       </div>
                     ))
                   ) : (
-                    <p className="text-center text-slate-400 text-xs py-8">Nenhum recado publicado para esta turma.</p>
+                    <p className="text-center text-slate-400 text-xs py-8">Nenhum recado nesta categoria.</p>
                   )}
                 </div>
               </div>
@@ -611,13 +814,13 @@ export default function TurmasManager({ initialTurmas }: ManagerProps) {
   );
 }
 
-function SubmitButton({ label = 'Salvar' }: { label?: string }) {
+function SubmitButton({ label = 'Salvar', disabled = false }: { label?: string, disabled?: boolean }) {
   const { pending } = useFormStatus();
 
   return (
     <button
       type="submit"
-      disabled={pending}
+      disabled={pending || disabled}
       className="bg-[#00185f] hover:bg-[#001144] disabled:opacity-50 text-white text-xs font-bold px-6 py-2.5 rounded-lg shadow-sm transition-colors outline-none"
     >
       {pending ? 'Processando...' : label}
